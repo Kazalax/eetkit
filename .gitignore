@@ -5,3 +5,6 @@ TestResults/
 .idea/
 *.user
 .playwright-mcp/
+
+# Documents marked TLP:AMBER (limited disclosure) stay local, never in the public repo.
+docs/spec/tlp-amber/

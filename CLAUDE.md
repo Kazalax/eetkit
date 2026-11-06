@@ -5,6 +5,7 @@ Open-core .NET knihovna pro odesílání tržeb do EET 2.0 (rozhraní v4.1). Fre
 ## Zdroje pravdy
 
 - Oficiální dokumenty v `docs/spec/` (soupis v `docs/spec/README.md`). Při rozporu se zadáním platí ony a rozpor se hlásí uživateli.
+- Repo je veřejné. Dokumenty označené TLP:AMBER (provozní informace playground a anglická produkční) patří jen do ignorované `docs/spec/tlp-amber/`, nikdy do commitu. Před přidáním nového dokumentu zkontrolovat značku TLP.
 - Zadání: `docs/ZADANI.md`. Plány milníků: `docs/plans/`.
 - Vzorové requesty `docs/spec/*.eet.v4.req.xml` jsou autoritou pro podobu podepsané zprávy. Certifikáty v nich jsou bajtově stejné jako v testovacích .p12 z `CAEET_Playground_2026_v1.zip` (ověřeno 6. 11. 2026).
 
