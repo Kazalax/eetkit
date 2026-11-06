@@ -8,10 +8,10 @@ namespace EetKit.Internal;
 internal static class EnvelopeSerializer
 {
     /// <summary>
-    /// Limit of the whole signed message. The documentation says 12 kB without defining the unit,
-    /// the stricter reading is used. To be confirmed on the playground (error 7) in M2.
+    /// Limit of the whole signed message. The documentation says 12 kB; measured on the playground
+    /// on 2026-11-06: 12 288 bytes accepted, 12 289 bytes rejected with error 7.
     /// </summary>
-    public const int MaxMessageBytes = 12_000;
+    public const int MaxMessageBytes = 12_288;
 
     private static readonly UTF8Encoding Utf8WithoutBom = new(encoderShouldEmitUTF8Identifier: false);
 

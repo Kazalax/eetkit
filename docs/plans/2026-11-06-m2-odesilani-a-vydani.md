@@ -45,6 +45,9 @@ Všechna omezení z plánu M1 platí dál. Navíc:
 9. **`IEetCertificateProvider` je v jádru** a `EetClient` se ptá na certifikát při každém odeslání. Výměna certifikátu za běhu v M4 pak nepotřebuje nový klient.
 10. **`uuid_zpravy` v odpovědi se musí shodovat s odeslaným**, pokud v odpovědi je. Jinak `TemporaryError`.
 11. **`Trzba` dostane konstruktor** s `[SetsRequiredMembers]` (rozhodnutí 8 z M1).
+12. **Ověřování podpisu odpovědi přijme jen algoritmy EET:** kanonikalizace exc-c14n, `rsa-sha256`, jediná reference se `sha256` a jedinou transformací exc-c14n. `SignedXml` by jinak přijal cokoli, co si odesílatel zvolí.
+13. **Podepisování je pod zámkem v `EetCertificate`.** Klient se sdílí (DI singleton) a `RSACryptoServiceProvider` na .NET Framework není zaručeně bezpečný při souběhu.
+14. **Odpověď se čte podle jmenného prostoru, ne podle prefixu** (`eet:` v odpovědi, `v4:` ve vzorech).
 
 ## Na co dát pozor při revizi
 
@@ -68,7 +71,8 @@ Všechna omezení z plánu M1 platí dál. Navíc:
 - `Trzba`: veřejný konstruktor `(string eicPopl, int idJednotky, string idPokl, string poradCis, DateTimeOffset datTrzby, decimal celkTrzba)` s `[SetsRequiredMembers]` a bezparametrový konstruktor.
 - `EnvelopeSerializer.MaxMessageBytes = 12_288`.
 
-- [ ] Testy: `Trzba_Constructor_SetsRequiredMembers`; `Serialize_AtLimit_Passes` (přesně 12 288 B), `Serialize_OverLimit_Throws` (12 289 B); `EetResult_IsRetryable_OnlyForTemporaryError`.
+- [ ] Uložit odpovědi a certifikáty I.CA z pokusů na playgroundu do repa (fixtures s datem a `X-Global-Transaction-Id`).
+- [ ] Testy: `Trzba_Constructor_SetsRequiredMembers`; `Sign_Concurrent20_AllVerify` (rozhodnutí 13); `Serialize_AtLimit_Passes` (přesně 12 288 B), `Serialize_OverLimit_Throws` (12 289 B); `EetResult_IsRetryable_OnlyForTemporaryError`.
 - [ ] Testy selžou, implementace, testy zelené, commit `feat(api): add result types, certificate provider and Trzba constructor`.
 
 ### Task 2: Důvěra v certifikát serveru
@@ -79,7 +83,7 @@ Všechna omezení z plánu M1 platí dál. Navíc:
 - `internal static bool ServerCertificateTrust.IsTrusted(X509Certificate2 certificate, DateTimeOffset now)`: řetězec přes přibalený vydavatel k přibalenému kořenu (net5+ `CustomRootTrust`, netstandard2.0 `AllowUnknownCertificateAuthority` a kontrola otisku kořene), bez revokace, čas `now`; subjekt obsahuje `O=Generální finanční ředitelství`.
 - `WsSecurityVerifier.Verify(XmlDocument envelope, Func<X509Certificate2, bool>? isTrusted = null)`: s funkcí důvěry vrátí `true` jen pro důvěryhodný certifikát.
 
-- [ ] Testy: uložené potvrzení z playgroundu se ověří a je důvěryhodné (čas 2026-11-06); vzorový request (podepsaný EET CA playground) důvěryhodný není; certifikát po `NotAfter` není; potvrzení se změněným POK neprojde; otisky přibalených certifikátů se rovnají hodnotám z ica.cz.
+- [ ] Testy: uložené potvrzení z playgroundu se ověří a je důvěryhodné (čas 2026-11-06); vzorový request (podepsaný EET CA playground) důvěryhodný není; certifikát po `NotAfter` není; potvrzení se změněným POK neprojde; otisky přibalených certifikátů se rovnají hodnotám z ica.cz; podpis s `rsa-sha1` nebo jinou kanonikalizací neprojde (rozhodnutí 12). Větev pro netstandard2.0 (kontrola otisku kořene a `ChainStatus` jen `UntrustedRoot`) se lokálně nespustí, ověří ji až testy na .NET Framework.
 - [ ] Testy selžou, implementace, testy zelené, commit `feat(signing): trust server signatures only from I.CA and GFŘ`.
 
 ### Task 3: Čtení odpovědi
@@ -91,7 +95,7 @@ Všechna omezení z plánu M1 platí dál. Navíc:
 - `internal sealed record ResponseContext(Guid SentUuid, string? GlobalTransactionId, IReadOnlyList<string> LocalWarnings, DateTimeOffset Now)`
 - Bezpečné čtení XML. `Potvrzeni` vyžaduje ověřený a důvěryhodný podpis (Task 2), jinak `TemporaryError`.
 
-- [ ] Testy: potvrzení z playgroundu → `Confirmed`, POK, `IsTest`, `DatPrij`; chyba 4 → `Rejected`, `ErrorCode 4`, text, `DatOdmit`; kódy -1, 0, 2–8, -5, 1, 9 podle rozhodnutí 6 a 7; varování (`kod_varov`, text) se přenesou; neshoda `uuid_zpravy` → `TemporaryError`; SOAP Fault → `TemporaryError`; nesmyslný obsah → `TemporaryError`; odpověď s `<!DOCTYPE` a externí entitou se nenačte (`TemporaryError`, žádný přístup k souboru).
+- [ ] Testy: potvrzení z playgroundu → `Confirmed`, POK, `IsTest`, `DatPrij`; totéž s prefixem `v4:` místo `eet:` dá stejný výsledek; chyba 4 → `Rejected`, `ErrorCode 4`, text, `DatOdmit`; kódy -1, 0, 2–8, -5, 1, 9 podle rozhodnutí 6 a 7; varování (`kod_varov`, text) se přenesou; neshoda `uuid_zpravy` → `TemporaryError`; SOAP Fault → `TemporaryError`; nesmyslný obsah → `TemporaryError`; odpověď s `<!DOCTYPE` a externí entitou se nenačte (`TemporaryError`, žádný přístup k souboru).
 - [ ] Testy selžou, implementace, testy zelené, commit `feat(response): parse and classify server responses`.
 
 ### Task 4: EetClient a transport
@@ -115,7 +119,7 @@ Všechna omezení z plánu M1 platí dál. Navíc:
 - [ ] Bez `EET_PLAYGROUND=1` se testy přeskočí (`Assert.Skip`).
 - [ ] Testy: tři EIČ → `Confirmed`, POK končí `-ff`, `IsTest`; `Overeni=true` → `VerifiedOnly`, kód 0; zpráva se změněným tělem po podpisu (`SendRawAsync`) → `Rejected`, kód 4; zpráva 12 289 B (komentář v hlavičce, `SendRawAsync`) → `Rejected`, kód 7.
 - [ ] Spustit lokálně s `EET_PLAYGROUND=1` a ukázat výstup.
-- [ ] Workflow `playground.yml`: každou noc a ručně, Ubuntu, .NET 10. CI akce zvednout na `actions/checkout@v7` a `actions/setup-dotnet@v6`.
+- [ ] Workflow `playground.yml`: každou noc a ručně, Ubuntu, .NET 10, jen v `Kazalax/eetkit` (`if: github.repository == 'Kazalax/eetkit'`), aby forky neposílaly na server FS. CI akce zvednout na `actions/checkout@v7` a `actions/setup-dotnet@v6`.
 - [ ] Commit `test(playground): verify sending against the EET playground`.
 
 ### Task 6: DI balíček a ukázková aplikace

@@ -13,6 +13,8 @@ public sealed class EetCertificate : IDisposable
     private const string LoadFailedMessage =
         "Certifikát .p12 se nepodařilo načíst. Zkontrolujte soubor a heslo.";
 
+    private readonly object _signLock = new();
+
     private EetCertificate(X509Certificate2 certificate, RSA privateKey)
     {
         Certificate = certificate;
@@ -30,6 +32,18 @@ public sealed class EetCertificate : IDisposable
     internal X509Certificate2 Certificate { get; }
 
     internal RSA PrivateKey { get; }
+
+    /// <summary>
+    /// RSA-SHA256 PKCS#1 v1.5 signature. Serialized because a shared client signs from many
+    /// threads and RSACryptoServiceProvider on .NET Framework is not guaranteed thread-safe.
+    /// </summary>
+    internal byte[] SignSha256(byte[] data)
+    {
+        lock (_signLock)
+        {
+            return PrivateKey.SignData(data, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
+        }
+    }
 
     /// <summary>Načte certifikát z obsahu souboru .p12.</summary>
     /// <param name="data">Obsah souboru .p12 (PKCS#12).</param>

@@ -118,14 +118,52 @@ public sealed class WsSecuritySignerTests
         Assert.True(EnvelopeSerializer.ToUtf8(SignedEnvelope()).Length < EnvelopeSerializer.MaxMessageBytes);
     }
 
+    // Measured on the playground on 2026-11-06: 12 288 bytes accepted, 12 289 bytes rejected with error 7.
+    private const int PlaygroundLimitBytes = 12_288;
+
+    [Fact]
+    public void Serialize_AtLimit_Passes()
+    {
+        var envelope = PaddedTo(SignedEnvelope(), PlaygroundLimitBytes);
+
+        Assert.Equal(PlaygroundLimitBytes, EnvelopeSerializer.ToUtf8(envelope).Length);
+    }
+
     [Fact]
     public void Serialize_OverLimit_ThrowsValidationException()
     {
-        var envelope = SignedEnvelope();
-        Body(envelope).AppendChild(envelope.CreateComment(new string('x', EnvelopeSerializer.MaxMessageBytes)));
+        var envelope = PaddedTo(SignedEnvelope(), PlaygroundLimitBytes + 1);
 
         var exception = Assert.Throws<EetValidationException>(() => EnvelopeSerializer.ToUtf8(envelope));
 
         Assert.Equal("zprava", Assert.Single(exception.Errors).Field);
+    }
+
+    [Fact]
+    public async Task Sign_Concurrent20_AllVerify()
+    {
+        var sample = SampleRequest.Load(Eic);
+        var (p12, password) = SpecFiles.TestCertificate(Eic);
+        using var certificate = EetCertificate.FromPkcs12(p12, password);
+
+        var envelopes = await Task.WhenAll(Enumerable.Range(0, 20).Select(_ => Task.Run(() =>
+        {
+            var ids = SoapEnvelopeIds.CreateRandom();
+            var envelope = SoapEnvelopeBuilder.Build(sample.Trzba, sample.Header, ids);
+            WsSecuritySigner.Sign(envelope, certificate, ids);
+            return envelope;
+        }, TestContext.Current.CancellationToken)));
+
+        Assert.All(envelopes, envelope => Assert.True(WsSecurityVerifier.Verify(envelope)));
+    }
+
+    // A comment in the unsigned header changes the size without touching the signature.
+    private static XmlDocument PaddedTo(XmlDocument envelope, int targetBytes)
+    {
+        const int CommentMarkupBytes = 7;
+        var header = envelope.DocumentElement!["Header", EetNamespaces.Soap]!;
+        var current = Encoding.UTF8.GetByteCount(envelope.OuterXml);
+        header.PrependChild(envelope.CreateComment(new string('x', targetBytes - current - CommentMarkupBytes)));
+        return envelope;
     }
 }

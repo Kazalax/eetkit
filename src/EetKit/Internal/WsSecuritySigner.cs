@@ -48,9 +48,7 @@ internal static class WsSecuritySigner
         // SignedInfo is canonicalized in place, so the namespaces of its ancestors are in scope.
         header.AppendChild(security);
         var canonicalSignedInfo = ExclusiveCanonicalizer.Canonicalize(signedInfo, SignedInfoInclusivePrefixes);
-        var signatureBytes = certificate.PrivateKey.SignData(
-            canonicalSignedInfo, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
-        signatureValue.InnerText = Convert.ToBase64String(signatureBytes);
+        signatureValue.InnerText = Convert.ToBase64String(certificate.SignSha256(canonicalSignedInfo));
     }
 
     private static string Digest(XmlElement body)

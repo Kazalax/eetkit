@@ -15,6 +15,7 @@ Open-core .NET knihovna pro odesílání tržeb do EET 2.0 (rozhraní v4.1). Fre
 - .NET 8 a 10 na Linuxu tyto .p12 načtou nativně, BouncyCastle není potřeba (ověřeno testy 6. 11. 2026). Windows a .NET Framework zatím neověřené.
 - Ověřování podpisu (`WsSecurityVerifier`) zatím nekontroluje důvěru v certifikát (řetězec k I.CA, subjekt GFŘ). Pro odpovědi serveru v M2 se to musí doplnit.
 - Otisk těla: exc-c14n elementu `soapenv:Body` s deklaracemi `soapenv`, `v4`, `wsu`, SHA-256. Ručním výpočtem sedí se všemi třemi vzory.
+- Limit zprávy je 12 288 bajtů (playground 6. 11. 2026: 12 288 B projde, 12 289 B chyba 7). `SOAPAction` server bere s uvozovkami i bez.
 - Vzory zapisují časy v UTC (`Z`). Dokumentace povoluje `+01:00`/`+02:00` i `Z`.
 - Shoda EIČ pověřujícího s poplatníkem a minimální datum tržby jsou propustné kontroly (popis rozhraní, kap. 2.2.4): server vydá POK s varováním.
 

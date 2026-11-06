@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace EetKit;
 
 /// <summary>
@@ -6,6 +8,26 @@ namespace EetKit;
 /// </summary>
 public sealed record Trzba
 {
+    /// <summary>Vytvoří tržbu, povinné položky se nastaví v inicializátoru.</summary>
+    public Trzba()
+    {
+    }
+
+    /// <summary>
+    /// Vytvoří tržbu s povinnými položkami. Hodí se pro projekty se starší verzí C#
+    /// (například .NET Framework), které nepodporují <c>required</c>.
+    /// </summary>
+    [SetsRequiredMembers]
+    public Trzba(string eicPopl, int idJednotky, string idPokl, string poradCis, DateTimeOffset datTrzby, decimal celkTrzba)
+    {
+        EicPopl = eicPopl;
+        IdJednotky = idJednotky;
+        IdPokl = idPokl;
+        PoradCis = poradCis;
+        DatTrzby = datTrzby;
+        CelkTrzba = celkTrzba;
+    }
+
     /// <summary>EIČ poplatníka (<c>eic_popl</c>), formát CZ a 8 až 10 číslic.</summary>
     public required string EicPopl { get; init; }
 
