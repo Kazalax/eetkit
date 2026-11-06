@@ -103,6 +103,29 @@ public sealed class EetFormatTests
         Assert.Equal(["Europe/Prague", "Central Europe Standard Time"], requested);
     }
 
+    [Fact]
+    public void ResolvePragueZone_NoTimeZoneData_UsesEuRules()
+    {
+        var zone = EetFormat.ResolvePragueZone(_ => throw new TimeZoneNotFoundException());
+
+        Assert.Equal(TimeSpan.FromHours(1), TimeZoneInfo.ConvertTime(new DateTimeOffset(2027, 1, 9, 3, 0, 0, TimeSpan.Zero), zone).Offset);
+        Assert.Equal(TimeSpan.FromHours(2), TimeZoneInfo.ConvertTime(new DateTimeOffset(2027, 6, 9, 3, 0, 0, TimeSpan.Zero), zone).Offset);
+    }
+
+    [Fact]
+    public void ResolvePragueZone_NoTimeZoneData_MatchesSystemZoneAcrossTransitions()
+    {
+        var builtIn = EetFormat.ResolvePragueZone(_ => throw new TimeZoneNotFoundException());
+        var system = EetFormat.ResolvePragueZone(TimeZoneInfo.FindSystemTimeZoneById);
+
+        for (var instant = new DateTimeOffset(2026, 1, 1, 0, 30, 0, TimeSpan.Zero);
+             instant < new DateTimeOffset(2029, 1, 1, 0, 0, 0, TimeSpan.Zero);
+             instant = instant.AddHours(1))
+        {
+            Assert.Equal(TimeZoneInfo.ConvertTime(instant, system).Offset, TimeZoneInfo.ConvertTime(instant, builtIn).Offset);
+        }
+    }
+
     [Theory]
     [InlineData(true, "true")]
     [InlineData(false, "false")]
