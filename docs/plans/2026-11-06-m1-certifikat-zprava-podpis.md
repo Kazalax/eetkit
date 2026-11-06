@@ -29,6 +29,8 @@
 4. **Shoda EIČ pověřujícího s EIČ poplatníka je varování, ne chyba.** Popis rozhraní (kap. 2.2.4, bod 3) ji řadí mezi propustné kontroly: server vydá POK s varováním 7. Zadání ji zakazuje.
 5. **Minimální datum tržby je varování.** Podle kap. 2.2.4, bod 4 jde o propustnou kontrolu.
 6. **Limit 12 kB počítáme jako 12 000 bajtů.** Dokumentace bajty neupřesňuje. Bereme přísnější výklad, zprávy mají kolem 4 kB. Ověří se na playgroundu v M2.
+7. **Vlastnost `PovereniVicePopl` místo `PovereniViceePopl`** (doplněno při implementaci). XSD má atribut `povereni_vice_popl`, zdvojené „e“ v zadání je překlep.
+8. **`Trzba` dostane v M2 před vydáním 0.1.0 i konstruktor** s `[SetsRequiredMembers]` (doplněno po revizi). Na netstandard2.0 nejde `required`/`init` použít z C# starší než 11, takže projekty na .NET Framework s výchozí verzí jazyka by `Trzba` nevytvořily. Konstruktor jen přibude, nic nerozbije. README uvede minimální verzi jazyka pro inicializátor.
 
 ## Na co dát pozor při revizi
 
