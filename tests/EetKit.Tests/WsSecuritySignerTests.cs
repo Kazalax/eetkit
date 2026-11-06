@@ -40,6 +40,47 @@ public sealed class WsSecuritySignerTests
     }
 
     [Fact]
+    public void Verify_WrappedBodyWithDuplicateId_False()
+    {
+        var document = WrapSignedBody(SampleRequest.LoadDocument(Eic), keepIdOnFakeBody: true);
+
+        Assert.False(WsSecurityVerifier.Verify(document));
+    }
+
+    [Fact]
+    public void Verify_ReferenceNotToEnvelopeBody_False()
+    {
+        var document = WrapSignedBody(SampleRequest.LoadDocument(Eic), keepIdOnFakeBody: false);
+
+        Assert.False(WsSecurityVerifier.Verify(document));
+    }
+
+    // Signature wrapping: the original signed Body moves into a wrapper in the Header and a fake
+    // Body with a different amount takes its place.
+    private static XmlDocument WrapSignedBody(XmlDocument document, bool keepIdOnFakeBody)
+    {
+        var envelope = document.DocumentElement!;
+        var header = envelope["Header", EetNamespaces.Soap]!;
+        var original = envelope["Body", EetNamespaces.Soap]!;
+
+        var fake = (XmlElement)original.CloneNode(deep: true);
+        if (!keepIdOnFakeBody)
+        {
+            fake.RemoveAttribute("Id", EetNamespaces.Wsu);
+        }
+
+        var data = fake.GetElementsByTagName("*").OfType<XmlElement>().Single(e => e.LocalName == "Data");
+        data.SetAttribute("celk_trzba", "1.00");
+
+        var wrapper = document.CreateElement("wrap", "Wrapper", "urn:attacker");
+        envelope.RemoveChild(original);
+        wrapper.AppendChild(original);
+        header.AppendChild(wrapper);
+        envelope.AppendChild(fake);
+        return document;
+    }
+
+    [Fact]
     public void Verify_OwnSignature_True()
     {
         Assert.True(WsSecurityVerifier.Verify(SignedEnvelope()));
