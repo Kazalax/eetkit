@@ -11,6 +11,8 @@ Open-core .NET knihovna pro odesílání tržeb do EET 2.0 (rozhraní v4.1). Fre
 ## Ověřené technické fakty
 
 - Testovací .p12: certifikáty RC2-40, klíč 3DES. OpenSSL 3 je bez `-legacy` neotevře. Heslo je v archivu (`password_pokladni_cert_playground.txt`), nikam ho neopisovat.
+- .NET 8 a 10 na Linuxu tyto .p12 načtou nativně, BouncyCastle není potřeba (ověřeno testy 6. 11. 2026). Windows a .NET Framework zatím neověřené.
+- Ověřování podpisu (`WsSecurityVerifier`) zatím nekontroluje důvěru v certifikát (řetězec k I.CA, subjekt GFŘ). Pro odpovědi serveru v M2 se to musí doplnit.
 - Otisk těla: exc-c14n elementu `soapenv:Body` s deklaracemi `soapenv`, `v4`, `wsu`, SHA-256. Ručním výpočtem sedí se všemi třemi vzory.
 - Vzory zapisují časy v UTC (`Z`). Dokumentace povoluje `+01:00`/`+02:00` i `Z`.
 - Shoda EIČ pověřujícího s poplatníkem a minimální datum tržby jsou propustné kontroly (popis rozhraní, kap. 2.2.4): server vydá POK s varováním.
@@ -29,5 +31,6 @@ Rozhodnutí oproti zadání jsou v plánu M1, sekce „Rozhodnutí oproti zadán
 ## Příkazy
 
 - Build: `dotnet build -c Release`
-- Testy: `dotnet test -c Release`
+- Testy: `dotnet test -c Release` (xUnit v3 na Microsoft.Testing.Platform, zapnuto v `global.json`; filtr např. `--filter-class EetKit.Tests.SampleSignatureTests`)
+- Akceptační test podpisu: `SampleSignatureTests.Sign_MatchesSample` (shoda se třemi vzory finanční správy)
 - Playground testy: `EET_PLAYGROUND=1 dotnet test tests/EetKit.PlaygroundTests` (od M2)
