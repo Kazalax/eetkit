@@ -93,14 +93,14 @@
 
 **Interfaces:**
 - Produces (internal static `EetFormat`):
-  - `string Amount(decimal value)`: přesně 2 desetinná místa, invariantní kultura, `-0.00` normalizuje na `0.00`. Hodnotu s víc než 2 místy nepřijímá (to hlídá validace).
+  - `string Amount(decimal value)`: přesně 2 desetinná místa, invariantní kultura, `-0.00` normalizuje na `0.00`. Hodnota s víc než 2 desetinnými místy vyhodí `ArgumentException` (validace ji zachytí dřív).
   - `string DateTime(DateTimeOffset value)`: `yyyy-MM-ddTHH:mm:ss` + `Z` při posunu 0, jinak `±HH:mm`. Zlomky sekund odřízne.
   - `DateTimeOffset ToPragueTime(DateTimeOffset value)`: zóna `Europe/Prague`, když ji systém nezná, tak `Central Europe Standard Time`.
   - `string Bool(bool value)`: `true` / `false`.
   - `string Uuid(Guid value)`: malá písmena, 36 znaků.
 
 - [ ] **Step 1: Testy**
-  - `Amount`: `0.1m` → `"0.10"`, `1234567.8m` → `"1234567.80"`, `-0.00m` → `"0.00"`, `188580m` → `"188580.00"`, `-12.5m` → `"-12.50"`; výsledek je stejný pod kulturou `cs-CZ`.
+  - `Amount`: `0.1m` → `"0.10"`, `1234567.8m` → `"1234567.80"`, `-0.00m` → `"0.00"`, `188580m` → `"188580.00"`, `-12.5m` → `"-12.50"`; výsledek je stejný pod kulturou `cs-CZ`; `12.345m` vyhodí `ArgumentException`.
   - `DateTime`: `2026-07-01T09:02:18+00:00` → `"2026-07-01T09:02:18Z"`, `2027-01-09T04:25:28+01:00` → `"2027-01-09T04:25:28+01:00"`, hodnota s 500 ms se zapíše bez zlomku.
   - `ToPragueTime`: `2027-01-09T03:25:28Z` → posun `+01:00`, `2027-06-09T03:25:28Z` → posun `+02:00`.
   - `Uuid`: výstup odpovídá `^[0-9a-f-]{36}$`.
