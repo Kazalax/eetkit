@@ -18,10 +18,13 @@ Soubory jsou beze změny. Při rozporu se zadáním platí tyto dokumenty.
 
 | Soubor | Obsah |
 | --- | --- |
-| `EET_pristupove_provozni_informace_playgr-3.pdf` | Playground, verze 1.1, česky |
-| `EET_pristupove_provozni_informace_playgr-2.pdf` | Playground, verze 1.1, anglicky |
 | `EET_pristupove_provozni_informace_produk-2.pdf` | Produkce, verze 1.1, česky |
-| `EET_pristupove_provozni_informace_produk-3.pdf` | Produkce, verze 1.1, anglicky |
+
+Dokumenty označené TLP:AMBER (omezené šíření) v repu nejsou. Stáhněte si je z eet.gov.cz do `docs/spec/tlp-amber/`, kterou git ignoruje:
+
+- `EET_pristupove_provozni_informace_playgr-3.pdf`: playground, verze 1.1, česky
+- `EET_pristupove_provozni_informace_playgr-2.pdf`: playground, verze 1.1, anglicky
+- `EET_pristupove_provozni_informace_produk-3.pdf`: produkce, verze 1.1, anglicky
 
 ## Certifikáty a CA EET
 
