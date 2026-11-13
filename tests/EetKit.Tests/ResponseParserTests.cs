@@ -10,8 +10,8 @@ public sealed class ResponseParserTests
     // uuid_zpravy of the sample request that produced both saved responses.
     private static readonly Guid SentUuid = Guid.Parse("03965780-6457-4842-bd80-5f9195c0b8c8");
 
-    private static ResponseContext Context(Guid? sentUuid = null) =>
-        new(sentUuid ?? SentUuid, "bc626a986aeddff902bee4c0", ["místní varování"], Fixtures.CapturedAt);
+    private static ResponseContext Context(Guid? sentUuid = null, EetEnvironment environment = EetEnvironment.Playground) =>
+        new(sentUuid ?? SentUuid, "bc626a986aeddff902bee4c0", ["místní varování"], Fixtures.CapturedAt, environment);
 
     private static byte[] ErrorResponse(int code, string extra = "") => Encoding.UTF8.GetBytes(
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
@@ -43,6 +43,15 @@ public sealed class ResponseParserTests
             .Replace("3efd94d7-2afb-401d-b213-986a62bcae55-ff", "00000000-0000-4000-8000-000000000000-ff", StringComparison.Ordinal);
 
         var result = ResponseParser.Parse(Encoding.UTF8.GetBytes(body), Context());
+
+        Assert.Equal(EetStatus.TemporaryError, result.Status);
+        Assert.Null(result.Pok);
+    }
+
+    [Fact]
+    public void PlaygroundConfirmation_InProductionClient_TemporaryError()
+    {
+        var result = ResponseParser.Parse(Fixtures.Bytes(Fixtures.Potvrzeni), Context(environment: EetEnvironment.Production));
 
         Assert.Equal(EetStatus.TemporaryError, result.Status);
         Assert.Null(result.Pok);

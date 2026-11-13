@@ -9,7 +9,8 @@ internal sealed record ResponseContext(
     Guid SentUuid,
     string? GlobalTransactionId,
     IReadOnlyList<string> LocalWarnings,
-    DateTimeOffset Now);
+    DateTimeOffset Now,
+    EetEnvironment Environment);
 
 /// <summary>
 /// Reads the server's SOAP response and classifies it (plan M2, decisions 5 to 7 and 10).
@@ -109,12 +110,25 @@ internal static class ResponseParser
             return Temporary(context, "Podpis potvrzení se nepodařilo ověřit, potvrzení nejde použít.");
         }
 
+        // A confirmation must name the message it confirms; error responses may omit it when the
+        // server could not read the request, a confirmation never does.
+        if (Attribute(hlavicka, "uuid_zpravy") is null)
+        {
+            return Temporary(context, "Potvrzení neuvádí uuid_zpravy, nejde ho přiřadit k odeslané zprávě.");
+        }
+
+        var isTest = BoolAttribute(potvrzeni, "test");
+        if (isTest != (context.Environment == EetEnvironment.Playground))
+        {
+            return Temporary(context, "Potvrzení pochází z jiného prostředí, než do kterého se zpráva posílala.");
+        }
+
         return new EetResult(EetStatus.Confirmed, context.SentUuid, context.LocalWarnings)
         {
             Pok = pok,
             Warnings = warnings,
             DatPrij = TimeAttribute(hlavicka, "dat_prij"),
-            IsTest = BoolAttribute(potvrzeni, "test"),
+            IsTest = isTest,
             GlobalTransactionId = context.GlobalTransactionId,
         };
     }
