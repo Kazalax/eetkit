@@ -1,0 +1,26 @@
+name: Playground
+
+# Sends real test messages to the EET playground of the Czech Financial Administration.
+on:
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+
+jobs:
+  playground:
+    # Forks must not send to the playground on their own schedule.
+    if: github.repository == 'Kazalax/eetkit'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.x
+
+      - name: Test against playground
+        env:
+          EET_PLAYGROUND: "1"
+        run: dotnet test --project tests/EetKit.PlaygroundTests -c Release -f net10.0

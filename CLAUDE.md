@@ -13,7 +13,7 @@ Open-core .NET knihovna pro odesílání tržeb do EET 2.0 (rozhraní v4.1). Fre
 
 - Testovací .p12: certifikáty RC2-40, klíč 3DES. OpenSSL 3 je bez `-legacy` neotevře. Heslo je v archivu (`password_pokladni_cert_playground.txt`), nikam ho neopisovat.
 - .NET 8 a 10 na Linuxu tyto .p12 načtou nativně, BouncyCastle není potřeba (ověřeno testy 6. 11. 2026). Windows a .NET Framework zatím neověřené.
-- Ověřování podpisu (`WsSecurityVerifier`) zatím nekontroluje důvěru v certifikát (řetězec k I.CA, subjekt GFŘ). Pro odpovědi serveru v M2 se to musí doplnit.
+- Odpovědi serveru podepisuje certifikát GFŘ od I.CA Public CA/RSA 06/2022 (kořen I.CA Root CA/RSA 05/2022). Oba certifikáty I.CA jsou přibalené v `src/EetKit/Certificates`, kořen v systémovém úložišti Linuxu není. Důvěru řeší `ServerCertificateTrust`, nikdy nic nestahuje.
 - Otisk těla: exc-c14n elementu `soapenv:Body` s deklaracemi `soapenv`, `v4`, `wsu`, SHA-256. Ručním výpočtem sedí se všemi třemi vzory.
 - Limit zprávy je 12 288 bajtů (playground 6. 11. 2026: 12 288 B projde, 12 289 B chyba 7). `SOAPAction` server bere s uvozovkami i bez.
 - Vzory zapisují časy v UTC (`Z`). Dokumentace povoluje `+01:00`/`+02:00` i `Z`.
@@ -35,4 +35,4 @@ Rozhodnutí oproti zadání jsou v plánu M1, sekce „Rozhodnutí oproti zadán
 - Build: `dotnet build -c Release`
 - Testy: `dotnet test -c Release` (xUnit v3 na Microsoft.Testing.Platform, zapnuto v `global.json`; filtr např. `--filter-class EetKit.Tests.SampleSignatureTests`)
 - Akceptační test podpisu: `SampleSignatureTests.Sign_MatchesSample` (shoda se třemi vzory finanční správy)
-- Playground testy: `EET_PLAYGROUND=1 dotnet test tests/EetKit.PlaygroundTests` (od M2)
+- Playground testy: `EET_PLAYGROUND=1 dotnet test --project tests/EetKit.PlaygroundTests -c Release -f net10.0` (skutečný server FS; v CI každou noc, workflow `playground.yml`)

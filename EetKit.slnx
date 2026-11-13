@@ -3,6 +3,7 @@
     <Project Path="src/EetKit/EetKit.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/EetKit.PlaygroundTests/EetKit.PlaygroundTests.csproj" />
     <Project Path="tests/EetKit.Tests/EetKit.Tests.csproj" />
   </Folder>
 </Solution>

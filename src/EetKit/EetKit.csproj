@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="EetKit.Tests" />
+    <InternalsVisibleTo Include="EetKit.PlaygroundTests" />
   </ItemGroup>
 
 </Project>
