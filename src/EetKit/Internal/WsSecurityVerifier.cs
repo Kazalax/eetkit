@@ -10,11 +10,12 @@ namespace EetKit.Internal;
 /// Checks the WS-Security signature of a SOAP message with the certificate it carries.
 /// Only the shape EET uses is accepted: one signature in soapenv:Header/wsse:Security whose
 /// single reference points at the envelope's own soapenv:Body, with unique wsu:Id values.
-/// Trust in the certificate itself (I.CA chain, GFŘ subject) is not checked here.
+/// Only the EET algorithms are accepted (exc-c14n, rsa-sha256, sha256). Trust in the certificate
+/// itself is decided by <c>isTrusted</c>, for server responses <see cref="ServerCertificateTrust"/>.
 /// </summary>
 internal static class WsSecurityVerifier
 {
-    public static bool Verify(XmlDocument envelope)
+    public static bool Verify(XmlDocument envelope, Func<X509Certificate2, bool>? isTrusted = null)
     {
         Guard.NotNull(envelope, nameof(envelope));
 
@@ -51,7 +52,9 @@ internal static class WsSecurityVerifier
             var signedXml = new WsuSignedXml(envelope);
             signedXml.LoadXml(signature);
             if (signedXml.SignedInfo is not { References.Count: 1 } signedInfo
-                || ((Reference)signedInfo.References[0]!).Uri != "#" + bodyId)
+                || signedInfo.References[0] is not Reference reference
+                || reference.Uri != "#" + bodyId
+                || !UsesEetAlgorithms(signedInfo, reference))
             {
                 return false;
             }
@@ -64,7 +67,9 @@ internal static class WsSecurityVerifier
 
             using var certificate = LoadCertificate(Convert.FromBase64String(token.InnerText));
             using var publicKey = certificate.GetRSAPublicKey();
-            return publicKey is not null && signedXml.CheckSignature(publicKey);
+            return publicKey is not null
+                && signedXml.CheckSignature(publicKey)
+                && (isTrusted is null || isTrusted(certificate));
         }
         catch (CryptographicException)
         {
@@ -75,6 +80,13 @@ internal static class WsSecurityVerifier
             return false;
         }
     }
+
+    private static bool UsesEetAlgorithms(SignedInfo signedInfo, Reference reference) =>
+        signedInfo.CanonicalizationMethod == XmlSignatureAlgorithms.ExcC14n
+        && signedInfo.SignatureMethod == XmlSignatureAlgorithms.RsaSha256
+        && reference.DigestMethod == XmlSignatureAlgorithms.Sha256
+        && reference.TransformChain.Count == 1
+        && reference.TransformChain[0].Algorithm == XmlSignatureAlgorithms.ExcC14n;
 
     // The token is the one KeyInfo/SecurityTokenReference/Reference points to, not just any token.
     private static XmlElement? ReferencedToken(XmlDocument envelope, XmlElement signature)

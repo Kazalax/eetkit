@@ -15,8 +15,6 @@ internal static class WsSecuritySigner
         "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary";
     private const string X509TokenType =
         "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3";
-    private const string RsaSha256 = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256";
-    private const string Sha256 = "http://www.w3.org/2001/04/xmlenc#sha256";
     private const string SignedInfoInclusivePrefixes = "soapenv v4";
     private const string BodyInclusivePrefixes = "v4";
 
@@ -83,7 +81,7 @@ internal static class WsSecuritySigner
         signedInfo.AppendChild(canonicalization);
 
         var signatureMethod = Element(document, DsPrefix, "SignatureMethod", Ds);
-        signatureMethod.SetAttribute("Algorithm", RsaSha256);
+        signatureMethod.SetAttribute("Algorithm", XmlSignatureAlgorithms.RsaSha256);
         signedInfo.AppendChild(signatureMethod);
 
         var reference = Element(document, DsPrefix, "Reference", Ds);
@@ -95,7 +93,7 @@ internal static class WsSecuritySigner
         transforms.AppendChild(transform);
         reference.AppendChild(transforms);
         var digestMethod = Element(document, DsPrefix, "DigestMethod", Ds);
-        digestMethod.SetAttribute("Algorithm", Sha256);
+        digestMethod.SetAttribute("Algorithm", XmlSignatureAlgorithms.Sha256);
         reference.AppendChild(digestMethod);
         var digestValue = Element(document, DsPrefix, "DigestValue", Ds);
         digestValue.InnerText = digest;

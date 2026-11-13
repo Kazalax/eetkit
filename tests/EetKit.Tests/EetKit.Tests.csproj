@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <None Include="..\..\docs\spec\*.zip;..\..\docs\spec\*.xsd;..\..\docs\spec\*.xml" Link="spec\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="Fixtures\*.xml" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

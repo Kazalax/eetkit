@@ -11,6 +11,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Certificates\*.cer" LogicalName="EetKit.Certificates.%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup>
     <InternalsVisibleTo Include="EetKit.Tests" />
   </ItemGroup>
 
