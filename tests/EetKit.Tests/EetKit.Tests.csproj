@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\EetKit\EetKit.csproj" />
+    <ProjectReference Include="..\..\src\EetKit.Extensions.DependencyInjection\EetKit.Extensions.DependencyInjection.csproj" />
   </ItemGroup>
 
   <ItemGroup>
