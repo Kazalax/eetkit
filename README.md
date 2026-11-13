@@ -38,10 +38,10 @@ else if (vysledek.IsRetryable)
 | --- | --- | --- |
 | `Confirmed` | Server tržbu přijal | POK z `Pok` patří na účtenku |
 | `VerifiedOnly` | Ověřovací režim (`Overeni = true`), kód 0 | Zpráva je v pořádku, POK se nevydává |
-| `TemporaryError` | Timeout, výpadek sítě, chyba serveru (-1, 8, HTTP 5xx) | Poslat znovu s `PrvniZaslani = false`. Duplicitu server pozná sám |
-| `Rejected` | Server zprávu odmítl (kódy 2 až 7) | Opravit data nebo certifikát, opakování nepomůže |
+| `TemporaryError` | Timeout, výpadek sítě, chyba serveru (kódy -1 a 8), jakákoli chyba HTTP, odpověď bez platného podpisu | Poslat znovu s `PrvniZaslani = false`. Duplicitu server pozná sám |
+| `Rejected` | Server zprávu odmítl (kódy 2 až 7 a neznámé kladné kódy) | Opravit data nebo certifikát, opakování nepomůže |
 
-Neplatná data se nikdy neodešlou: `SendAsync` vyhodí `EetValidationException` se seznamem polí. Místní varování (například neobvyklý tvar `id_jednotky` nebo brzy končící certifikát) jsou v `LocalWarnings`, varování serveru ve `Warnings`.
+Neplatná data se nikdy neodešlou: `SendAsync` vyhodí `EetValidationException` se seznamem polí. Místní varování (například neobvyklý tvar `id_jednotky`, prošlý certifikát nebo EIČ, které nesedí s certifikátem) jsou v `LocalWarnings`, varování serveru ve `Warnings`.
 
 ## Playground
 
@@ -66,13 +66,13 @@ builder.Services.AddEet(o =>
 });
 ```
 
-`EetClient` si pak nechte předat do konstruktoru. Nastavení se zkontroluje při startu aplikace. Vlastní zdroj certifikátu (například trezor klíčů) zaregistrujte jako `IEetCertificateProvider`.
+`EetClient` je jedna sdílená instance, nechte si ji předat do konstruktoru. Při startu aplikace se zkontroluje nastavení a certifikát se zkusí otevřít, takže špatná cesta nebo heslo zastaví start. Vlastní zdroj certifikátu (například trezor klíčů) zaregistrujte jako `IEetCertificateProvider`.
 
 ## Co knihovna hlídá
 
 - Podpis přesně podle vzorových zpráv finanční správy (shoda na bajt je ověřená testem).
 - Starý formát .p12 z DIS+ se načte na Windows i Linuxu bez zásahu do OpenSSL.
-- Odpověď se přijme jen s platným podpisem certifikátu Generálního finančního ředitelství od I.CA, ze správného prostředí a k odeslané zprávě.
+- Potvrzení s POK se přijme jen s platným podpisem certifikátu Generálního finančního ředitelství od I.CA, ze správného prostředí a k odeslané zprávě. Chybové odpovědi server nepodepisuje.
 - Zpráva nad 12 288 bajtů se neodešle (limit ověřený na playgroundu).
 - Heslo, klíč ani obsah certifikátu se nikam nelogují.
 

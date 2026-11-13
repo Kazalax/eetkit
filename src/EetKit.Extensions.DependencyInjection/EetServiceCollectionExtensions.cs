@@ -10,10 +10,13 @@ public static class EetServiceCollectionExtensions
     /// <summary>Jméno HTTP klienta v <c>IHttpClientFactory</c>, pro vlastní nastavení handleru.</summary>
     public const string HttpClientName = "EetKit";
 
+    // Production balances by DNS; pooled connections are renewed so new ones ask DNS again.
+    private static readonly TimeSpan PooledConnectionLifetime = TimeSpan.FromMinutes(2);
+
     /// <summary>
-    /// Zaregistruje <see cref="EetClient"/>. Certifikát se vezme z <see cref="EetOptions"/>,
-    /// nebo z vlastního <see cref="IEetCertificateProvider"/>, pokud je zaregistrovaný.
-    /// Nastavení se kontroluje při startu aplikace.
+    /// Zaregistruje <see cref="EetClient"/> jako jednu sdílenou instanci. Certifikát se vezme
+    /// z <see cref="EetOptions"/>, nebo z vlastního <see cref="IEetCertificateProvider"/>, pokud je
+    /// zaregistrovaný (před voláním i po něm). Nastavení i certifikát se zkontrolují při startu aplikace.
     /// </summary>
     public static IServiceCollection AddEet(this IServiceCollection services, Action<EetOptions> configure)
     {
@@ -32,15 +35,27 @@ public static class EetServiceCollectionExtensions
         }
 #endif
 
-        services.AddOptions<EetOptions>().Configure(configure).ValidateOnStart();
-        services.AddSingleton<IValidateOptions<EetOptions>>(sp =>
-            new EetOptionsValidator(HasCustomCertificateProvider(sp)));
-        services.TryAddSingleton<OptionsCertificateProvider>();
-        services.TryAddSingleton<IEetCertificateProvider>(sp => sp.GetRequiredService<OptionsCertificateProvider>());
+        var defaultProvider = ServiceDescriptor.Singleton<IEetCertificateProvider>(
+            sp => sp.GetRequiredService<OptionsCertificateProvider>());
 
-        // IHttpClientFactory recycles handlers (2 min by default), so DNS changes are picked up.
+        services.AddOptions<EetOptions>().Configure(configure).ValidateOnStart();
+
+        // Whether a custom provider exists is read from the registrations, never by resolving it:
+        // a provider that depends on the options would otherwise deadlock their creation.
+        services.AddSingleton<IValidateOptions<EetOptions>>(
+            new EetOptionsValidator(() => !IsLastProviderRegistration(services, defaultProvider)));
+        services.TryAddSingleton<OptionsCertificateProvider>();
+        services.TryAdd(defaultProvider);
+
+#if NET5_0_OR_GREATER
+        services.AddHttpClient(HttpClientName).ConfigurePrimaryHttpMessageHandler(() =>
+            new SocketsHttpHandler { PooledConnectionLifetime = PooledConnectionLifetime });
+#else
+        // TODO: on .NET Framework DNS refresh relies on ServicePointManager defaults; verify once net48 tests exist.
         services.AddHttpClient(HttpClientName);
-        services.AddTransient(sp =>
+#endif
+
+        services.TryAddSingleton(sp =>
         {
             var options = sp.GetRequiredService<IOptions<EetOptions>>().Value;
             return new EetClient(
@@ -53,6 +68,6 @@ public static class EetServiceCollectionExtensions
         return services;
     }
 
-    private static bool HasCustomCertificateProvider(IServiceProvider services) =>
-        services.GetRequiredService<IEetCertificateProvider>() is not OptionsCertificateProvider;
+    private static bool IsLastProviderRegistration(IServiceCollection services, ServiceDescriptor descriptor) =>
+        ReferenceEquals(services.LastOrDefault(d => d.ServiceType == typeof(IEetCertificateProvider)), descriptor);
 }

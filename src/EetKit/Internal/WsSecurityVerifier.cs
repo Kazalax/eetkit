@@ -91,8 +91,8 @@ internal static class WsSecurityVerifier
     // The token is the one KeyInfo/SecurityTokenReference/Reference points to, not just any token.
     private static XmlElement? ReferencedToken(XmlDocument envelope, XmlElement signature)
     {
-        var reference = signature.GetElementsByTagName("Reference", Wsse).OfType<XmlElement>().SingleOrDefault();
-        var uri = reference?.GetAttribute("URI");
+        var references = signature.GetElementsByTagName("Reference", Wsse).OfType<XmlElement>().ToList();
+        var uri = references.Count == 1 ? references[0].GetAttribute("URI") : null;
         if (uri is null || uri.Length < 2 || uri[0] != '#')
         {
             return null;

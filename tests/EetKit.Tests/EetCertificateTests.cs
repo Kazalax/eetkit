@@ -61,6 +61,14 @@ public sealed class EetCertificateTests
     }
 
     [Fact]
+    public void MissingFile_ThrowsCertificateException()
+    {
+        var path = System.IO.Path.Combine(System.IO.Path.GetTempPath(), $"eetkit-missing-{Guid.NewGuid():N}.p12");
+
+        Assert.Throws<EetCertificateException>(() => EetCertificate.FromPkcs12File(path, "heslo"));
+    }
+
+    [Fact]
     public void CorruptedData_Throws()
     {
         var garbage = new byte[512];

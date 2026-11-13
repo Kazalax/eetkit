@@ -34,8 +34,8 @@ else if (result.IsRetryable)
 | --- | --- | --- |
 | `Confirmed` | Accepted | Print `Pok` on the receipt |
 | `VerifiedOnly` | Verification mode, code 0 | No POK is issued |
-| `TemporaryError` | Timeout, network or server error | Send again with `PrvniZaslani = false` |
-| `Rejected` | Rejected (codes 2 to 7) | Fix the data or certificate |
+| `TemporaryError` | Timeout, network error, server error (codes -1 and 8), any HTTP error, unverifiable signature | Send again with `PrvniZaslani = false` |
+| `Rejected` | Rejected (codes 2 to 7 and unknown positive codes) | Fix the data or certificate |
 
 Invalid data is never sent: `SendAsync` throws `EetValidationException` listing the fields.
 

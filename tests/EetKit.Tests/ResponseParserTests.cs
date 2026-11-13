@@ -156,6 +156,30 @@ public sealed class ResponseParserTests
     }
 
     [Fact]
+    public void ErrorWithInvalidTestFlag_ClassifiedWithoutException()
+    {
+        var body = Encoding.UTF8.GetString(ErrorResponse(4)).Replace("test=\"true\"", "test=\"ano\"", StringComparison.Ordinal);
+
+        var result = ResponseParser.Parse(Encoding.UTF8.GetBytes(body), Context());
+
+        Assert.Equal(EetStatus.Rejected, result.Status);
+        Assert.False(result.IsTest);
+    }
+
+    [Fact]
+    public void ConfirmationWithTwoTokenReferences_TemporaryErrorWithoutException()
+    {
+        // KeyInfo is not signed, so anyone on the way could add a second reference.
+        var body = Encoding.UTF8.GetString(Fixtures.Bytes(Fixtures.Potvrzeni));
+        var reference = System.Text.RegularExpressions.Regex.Match(body, "<wsse:Reference [^>]*/>").Value;
+        body = body.Replace(reference, reference + reference, StringComparison.Ordinal);
+
+        var result = ResponseParser.Parse(Encoding.UTF8.GetBytes(body), Context());
+
+        Assert.Equal(EetStatus.TemporaryError, result.Status);
+    }
+
+    [Fact]
     public void ExternalEntity_NotResolved()
     {
         const string Secret = "TAJNY-OBSAH-SOUBORU";

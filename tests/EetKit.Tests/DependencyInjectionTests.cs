@@ -88,6 +88,51 @@ public sealed class DependencyInjectionTests
         Assert.Single(handler.Requests);
     }
 
+    [Fact]
+    public void Client_IsSingleton()
+    {
+        using var provider = Build(TestCertificate);
+
+        Assert.Same(provider.GetRequiredService<EetClient>(), provider.GetRequiredService<EetClient>());
+    }
+
+    [Fact]
+    public void WrongPassword_FailsValidationAtStart()
+    {
+        var (p12, _) = SpecFiles.TestCertificate(Eic);
+        using var provider = Build(o =>
+        {
+            o.CertificateBytes = p12;
+            o.CertificatePassword = "spatne-heslo-123";
+        });
+
+        var exception = Assert.Throws<OptionsValidationException>(() => provider.GetRequiredService<IOptions<EetOptions>>().Value);
+        Assert.DoesNotContain("spatne-heslo-123", exception.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task CustomProviderDependingOnOptions_DoesNotDeadlock()
+    {
+        var (p12, password) = SpecFiles.TestCertificate(Eic);
+        using var provider = Build(
+            o =>
+            {
+                o.CertificateBytes = p12;
+                o.CertificatePassword = password;
+            },
+            services => services.AddSingleton<IEetCertificateProvider, ProviderUsingOptions>());
+
+        var resolve = Task.Run(() => provider.GetRequiredService<EetClient>(), TestContext.Current.CancellationToken);
+
+        Assert.NotNull(await resolve.WaitAsync(TimeSpan.FromSeconds(10), TestContext.Current.CancellationToken));
+    }
+
+    private sealed class ProviderUsingOptions(IOptions<EetOptions> options) : IEetCertificateProvider
+    {
+        public EetCertificate GetCertificate() =>
+            EetCertificate.FromPkcs12(options.Value.CertificateBytes!, options.Value.CertificatePassword!);
+    }
+
     private sealed class CustomProvider(EetCertificate certificate) : IEetCertificateProvider
     {
         public EetCertificate GetCertificate() => certificate;

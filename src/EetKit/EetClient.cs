@@ -130,15 +130,11 @@ public sealed class EetClient : IDisposable
                 .ConfigureAwait(false);
             var transactionId = response.Headers.TryGetValues(TransactionIdHeader, out var values) ? values.FirstOrDefault() : null;
 
-            var status = (int)response.StatusCode;
-            if (IsTemporaryHttpStatus(status))
-            {
-                return Failure(EetStatus.TemporaryError, uuid, localWarnings, transactionId, HttpStatusText(status));
-            }
-
+            // Any other status says nothing reliable about the sale (a proxy or firewall may answer
+            // 403 or 407), so the sale must be sent again rather than given up.
             if (response.StatusCode != HttpStatusCode.OK)
             {
-                return Failure(EetStatus.Rejected, uuid, localWarnings, transactionId, HttpStatusText(status));
+                return Failure(EetStatus.TemporaryError, uuid, localWarnings, transactionId, HttpStatusText((int)response.StatusCode));
             }
 
             var body = await ReadBodyAsync(response, timeout.Token).ConfigureAwait(false);
@@ -158,9 +154,6 @@ public sealed class EetClient : IDisposable
 
     /// <inheritdoc />
     public void Dispose() => _owned?.Dispose();
-
-    private static bool IsTemporaryHttpStatus(int status) =>
-        status is (int)HttpStatusCode.RequestTimeout or 429 || status >= (int)HttpStatusCode.InternalServerError;
 
     private static string HttpStatusText(int status) =>
         string.Format(CultureInfo.InvariantCulture, "Server odpověděl HTTP {0}.", status);

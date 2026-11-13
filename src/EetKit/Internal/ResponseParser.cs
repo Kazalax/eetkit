@@ -46,6 +46,20 @@ internal static class ResponseParser
             return Temporary(context, "Odpověď serveru není čitelné XML.");
         }
 
+        // A malformed response must end as "send again", never as an exception in the cash register.
+        try
+        {
+            return ParseDocument(document, context);
+        }
+        catch (Exception ex) when (ex is FormatException or InvalidOperationException or ArgumentException
+            or OverflowException or XmlException or System.Security.Cryptography.CryptographicException)
+        {
+            return Temporary(context, "Odpověď serveru nejde zpracovat.");
+        }
+    }
+
+    private static EetResult ParseDocument(XmlDocument document, ResponseContext context)
+    {
         var soapBody = document.DocumentElement is { LocalName: "Envelope", NamespaceURI: Soap } envelope
             ? envelope["Body", Soap]
             : null;
@@ -91,7 +105,7 @@ internal static class ResponseParser
                 Warnings = warnings,
                 DatOdmit = TimeAttribute(hlavicka, "dat_odmit"),
                 DatPrij = TimeAttribute(hlavicka, "dat_prij"),
-                IsTest = BoolAttribute(chyba, "test"),
+                IsTest = BoolAttribute(chyba, "test") ?? false,
                 GlobalTransactionId = context.GlobalTransactionId,
             };
         }
@@ -117,7 +131,7 @@ internal static class ResponseParser
             return Temporary(context, "Potvrzení neuvádí uuid_zpravy, nejde ho přiřadit k odeslané zprávě.");
         }
 
-        var isTest = BoolAttribute(potvrzeni, "test");
+        var isTest = BoolAttribute(potvrzeni, "test") ?? false;
         if (isTest != (context.Environment == EetEnvironment.Playground))
         {
             return Temporary(context, "Potvrzení pochází z jiného prostředí, než do kterého se zpráva posílala.");
@@ -166,8 +180,13 @@ internal static class ResponseParser
             ? value
             : null;
 
-    private static bool BoolAttribute(XmlElement element, string name) =>
-        Attribute(element, name) is { } value && XmlConvert.ToBoolean(value);
+    // xs:boolean allows true, false, 1 and 0; anything else counts as missing.
+    private static bool? BoolAttribute(XmlElement element, string name) => Attribute(element, name) switch
+    {
+        "true" or "1" => true,
+        "false" or "0" => false,
+        _ => null,
+    };
 
     private static DateTimeOffset? TimeAttribute(XmlElement element, string name) =>
         Attribute(element, name) is { } value

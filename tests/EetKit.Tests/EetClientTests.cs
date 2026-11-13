@@ -175,8 +175,10 @@ public sealed class EetClientTests : IDisposable
     [InlineData(HttpStatusCode.ServiceUnavailable, EetStatus.TemporaryError)]
     [InlineData(HttpStatusCode.TooManyRequests, EetStatus.TemporaryError)]
     [InlineData(HttpStatusCode.RequestTimeout, EetStatus.TemporaryError)]
-    [InlineData(HttpStatusCode.NotFound, EetStatus.Rejected)]
-    [InlineData(HttpStatusCode.MethodNotAllowed, EetStatus.Rejected)]
+    [InlineData(HttpStatusCode.NotFound, EetStatus.TemporaryError)]
+    [InlineData(HttpStatusCode.MethodNotAllowed, EetStatus.TemporaryError)]
+    [InlineData(HttpStatusCode.Forbidden, EetStatus.TemporaryError)]
+    [InlineData(HttpStatusCode.ProxyAuthenticationRequired, EetStatus.TemporaryError)]
     public async Task HttpStatus_Classified(HttpStatusCode status, EetStatus expected)
     {
         var handler = StubHttpHandler.Returning([], status);

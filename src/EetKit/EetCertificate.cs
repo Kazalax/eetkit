@@ -82,7 +82,17 @@ public sealed class EetCertificate : IDisposable
     {
         Guard.NotNull(path, nameof(path));
 
-        return FromPkcs12(File.ReadAllBytes(path), password);
+        byte[] data;
+        try
+        {
+            data = File.ReadAllBytes(path);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException)
+        {
+            throw new EetCertificateException("Soubor s certifikátem .p12 nejde přečíst.", ex);
+        }
+
+        return FromPkcs12(data, password);
     }
 
     /// <summary>Vrátí varování k použití certifikátu pro daného poplatníka v daném okamžiku.</summary>

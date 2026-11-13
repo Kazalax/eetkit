@@ -58,6 +58,29 @@ public sealed class ServerCertificateTrustTests
     }
 
     [Fact]
+    public void HasRequiredOrganization_PlaygroundSigner_True()
+    {
+        var token = Fixtures.Document(Fixtures.Potvrzeni)
+            .GetElementsByTagName("BinarySecurityToken", EetNamespaces.Wsse).OfType<XmlElement>().Single();
+        using var signer = X509CertificateLoader.LoadCertificate(Convert.FromBase64String(token.InnerText));
+
+        Assert.True(ServerCertificateTrust.HasRequiredOrganization(signer));
+    }
+
+    [Fact]
+    public void HasRequiredOrganization_NewlineInCommonName_False()
+    {
+        var name = new X500DistinguishedNameBuilder();
+        name.AddCommonName("x\nO=Generální finanční ředitelství\ny");
+        name.AddOrganizationName("Utocnik s.r.o.");
+        using var key = RSA.Create(2048);
+        var request = new CertificateRequest(name.Build(), key, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
+        using var forged = request.CreateSelfSigned(Fixtures.CapturedAt.AddDays(-1), Fixtures.CapturedAt.AddDays(30));
+
+        Assert.False(ServerCertificateTrust.HasRequiredOrganization(forged));
+    }
+
+    [Fact]
     public void BundledIssuerItself_NotTrustedAsSigner()
     {
         Assert.False(ServerCertificateTrust.IsTrusted(ServerCertificateTrust.Issuer, Fixtures.CapturedAt));

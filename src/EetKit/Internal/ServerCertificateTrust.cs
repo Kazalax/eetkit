@@ -9,7 +9,7 @@ namespace EetKit.Internal;
 /// </summary>
 internal static class ServerCertificateTrust
 {
-    private const string RequiredOrganization = "O=Generální finanční ředitelství";
+    private const string RequiredOrganization = "Generální finanční ředitelství";
     private const string RootResource = "EetKit.Certificates.ica-root-rsa-2022.cer";
     private const string IssuerResource = "EetKit.Certificates.ica-public-rsa-2022.cer";
     private const int ExpectedChainLength = 3;
@@ -51,10 +51,23 @@ internal static class ServerCertificateTrust
     private static bool SameCertificate(X509Certificate2 left, X509Certificate2 right) =>
         left.RawData.SequenceEqual(right.RawData);
 
-    private static bool HasRequiredOrganization(X509Certificate2 certificate) =>
-        certificate.SubjectName.Decode(X500DistinguishedNameFlags.UseNewLines)
-            .Split('\n')
-            .Any(part => string.Equals(part.Trim(), RequiredOrganization, StringComparison.Ordinal));
+    /// <summary>
+    /// True when one organization (O, OID 2.5.4.10) attribute of the subject is exactly GFŘ. The name
+    /// is read attribute by attribute from its DER form, because text forms of a distinguished name
+    /// can be spoofed with separators inside other values (a newline in CN, for example).
+    /// </summary>
+    internal static bool HasRequiredOrganization(X509Certificate2 certificate)
+    {
+        try
+        {
+            return DistinguishedName.Organizations(certificate.SubjectName.RawData)
+                .Any(name => string.Equals(name, RequiredOrganization, StringComparison.Ordinal));
+        }
+        catch (FormatException)
+        {
+            return false;
+        }
+    }
 
     private static bool ChainsToBundledRoot(X509Certificate2 certificate, DateTimeOffset now)
     {

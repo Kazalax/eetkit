@@ -40,7 +40,7 @@ Všechna omezení z plánu M1 platí dál. Navíc:
 4. **Revokace (CRL, OCSP) se nekontroluje.** Kontrola by přidala síťová volání do každého odeslání a výpadek CRL serveru by zastavil evidenci.
 5. **Potvrzení s neověřitelným podpisem je `TemporaryError`**, ne `Confirmed`. Pokladna to zkusí znovu a server tržbu podle unikátnosti pozná.
 6. **Chyba 8 je v jádru `TemporaryError`.** Jádro si nepamatuje pokusy, omezený počet pokusů řeší fronta v M3.
-7. **Neznámé kódy:** záporné → `TemporaryError`, kladné → `Rejected`. **HTTP:** 408, 429 a 5xx → `TemporaryError`, ostatní kromě 200 → `Rejected`. SOAP Fault → `TemporaryError`.
+7. **Neznámé kódy:** záporné → `TemporaryError`, kladné → `Rejected`. **HTTP:** jakýkoli stav kromě 200 → `TemporaryError` (upraveno po revizi: odpověď proxy nebo firewallu o tržbě nic neříká a `Rejected` by mohlo vést ke ztrátě tržby). SOAP Fault → `TemporaryError`.
 8. **`EetResult.LocalWarnings`** (nad rámec zadání): místní varování validace a certifikátu, aby nezmizela.
 9. **`IEetCertificateProvider` je v jádru** a `EetClient` se ptá na certifikát při každém odeslání. Výměna certifikátu za běhu v M4 pak nepotřebuje nový klient.
 10. **`uuid_zpravy` v odpovědi se musí shodovat s odeslaným**, pokud v odpovědi je. Jinak `TemporaryError`.
