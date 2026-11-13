@@ -46,6 +46,24 @@ public sealed class ServerCertificateTrustTests
     }
 
     [Fact]
+    public void SelfSignedWithGfrSubject_NotTrusted()
+    {
+        using var key = RSA.Create(2048);
+        var request = new CertificateRequest(
+            "CN=Podvrh, O=Generální finanční ředitelství, C=CZ", key, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
+        request.CertificateExtensions.Add(new X509KeyUsageExtension(X509KeyUsageFlags.DigitalSignature, critical: true));
+        using var forged = request.CreateSelfSigned(Fixtures.CapturedAt.AddDays(-1), Fixtures.CapturedAt.AddDays(30));
+
+        Assert.False(ServerCertificateTrust.IsTrusted(forged, Fixtures.CapturedAt));
+    }
+
+    [Fact]
+    public void BundledIssuerItself_NotTrustedAsSigner()
+    {
+        Assert.False(ServerCertificateTrust.IsTrusted(ServerCertificateTrust.Issuer, Fixtures.CapturedAt));
+    }
+
+    [Fact]
     public void EmbeddedCertificates_MatchIcaFingerprints()
     {
         // SHA-256 fingerprints published on https://www.ica.cz/korenove-certifikaty (checked 2026-11-06).
