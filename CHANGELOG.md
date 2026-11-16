@@ -4,7 +4,7 @@ Formát podle [Keep a Changelog](https://keepachangelog.com/cs/1.1.0/), verze po
 
 ## [Unreleased]
 
-## [0.1.0] - 2026-11-13
+## [0.1.0] - 2026-11-16
 
 ### Přidáno
 
