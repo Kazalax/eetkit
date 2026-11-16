@@ -20,7 +20,7 @@
     <RepositoryUrl>https://github.com/Kazalax/eetkit</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageProjectUrl>https://github.com/Kazalax/eetkit</PackageProjectUrl>
-    <PackageTags>eet eet2 eet-2.0 evidence-trzeb trzby pokladna financni-sprava czech fiscal dotnet csharp</PackageTags>
+    <PackageTags>eet eet2 eet-2.0 evidence-trzeb elektronicka-evidence-trzeb trzby pokladna pok financni-sprava czech fiscal fiscalization pos dotnet csharp</PackageTags>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>

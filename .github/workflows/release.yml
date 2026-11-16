@@ -1,0 +1,56 @@
+name: Release
+
+# Publishes the packages to nuget.org when a version tag such as v0.1.0 is pushed.
+# Uses nuget.org Trusted Publishing (policy for Kazalax/eetkit, release.yml): no API key is stored anywhere.
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    # Forks must never try to publish.
+    if: github.repository == 'Kazalax/eetkit'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # lets NuGet/login exchange the GitHub token for a short-lived API key
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.x
+
+      - name: Check that the tag matches the version
+        shell: bash
+        run: |
+          version=$(dotnet msbuild src/EetKit/EetKit.csproj -getProperty:Version)
+          if [ "v$version" != "$GITHUB_REF_NAME" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match <Version>$version</Version> in Directory.Build.props"
+            exit 1
+          fi
+
+      - name: Build
+        run: dotnet build -c Release
+
+      - name: Test
+        run: dotnet test -c Release --no-build
+
+      - name: Pack
+        run: dotnet pack -c Release --no-build -o artifacts
+
+      # Right before the push: the temporary key is valid for one hour.
+      - name: NuGet login
+        id: login
+        uses: NuGet/login@v1
+        with:
+          user: Kazalax
+
+      - name: Push to nuget.org
+        run: dotnet nuget push "artifacts/*.nupkg" --api-key "${{ steps.login.outputs.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate

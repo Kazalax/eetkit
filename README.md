@@ -1,9 +1,9 @@
-# EetKit: EET 2.0 pro .NET
+# EetKit: EET 2.0 pro .NET a C#
 
 [![CI](https://github.com/Kazalax/eetkit/actions/workflows/ci.yml/badge.svg)](https://github.com/Kazalax/eetkit/actions/workflows/ci.yml)
 [![Ověřeno proti playgroundu](https://github.com/Kazalax/eetkit/actions/workflows/playground.yml/badge.svg)](https://github.com/Kazalax/eetkit/actions/workflows/playground.yml)
 
-Knihovna pro odesílání tržeb do elektronické evidence tržeb EET 2.0 (rozhraní v4.1), která startuje 1. 1. 2027. Zkontroluje data, sestaví a podepíše zprávu, pošle ji finanční správě, ověří podpis odpovědi a vrátí výsledek s POK.
+EetKit je open-source knihovna pro C# a .NET, která odesílá tržby do elektronické evidence tržeb EET 2.0 (datové rozhraní v4.1, evidence startuje 1. 1. 2027). Zkontroluje data tržby, sestaví a podepíše datovou zprávu (SOAP, WS-Security), pošle ji Finanční správě ČR, ověří podpis odpovědi a vrátí výsledek s kódem POK pro účtenku. Je určená pro vývojáře pokladních systémů, e-shopů a dalších aplikací, které tržby evidují.
 
 [English version](https://github.com/Kazalax/eetkit/blob/main/README.en.md)
 
@@ -15,7 +15,15 @@ Knihovna pro odesílání tržeb do elektronické evidence tržeb EET 2.0 (rozhr
 dotnet add package EetKit
 ```
 
-Testováno na .NET 8 a .NET 10 (Linux i Windows). Cíl `netstandard2.0` je určený pro .NET Framework, tam zatím testy neběží. Pro ASP.NET Core a další aplikace s DI je tu `EetKit.Extensions.DependencyInjection`.
+Pro ASP.NET Core a další aplikace s DI je tu ještě `EetKit.Extensions.DependencyInjection`.
+
+| Platforma | Stav |
+| --- | --- |
+| .NET 8 a .NET 10 | testováno na Linuxu i Windows |
+| .NET Framework 4.7.2 a novější | testováno na .NET Framework 4.8 (Windows), používá cíl `netstandard2.0` |
+| ostatní verze .NET (6, 7, 9, .NET Core 3.1) | měly by běžet přes cíl `netstandard2.0` nebo `net8.0`, netestováno |
+
+Automatické testy běží při každé změně na všech testovaných platformách. Odeslání na skutečný playground finanční správy běží každou noc na .NET 10 (Linux) a .NET Framework 4.8 (Windows).
 
 ## Příklad
 
@@ -71,10 +79,40 @@ builder.Services.AddEet(o =>
 ## Co knihovna hlídá
 
 - Podpis přesně podle vzorových zpráv finanční správy (shoda na bajt je ověřená testem).
-- Starý formát .p12 z DIS+ se načte na Windows i Linuxu bez zásahu do OpenSSL.
+- Starý formát `.p12`, jak ho vydává CA EET, se načte na Windows i Linuxu bez zásahu do OpenSSL.
 - Potvrzení s POK se přijme jen s platným podpisem certifikátu Generálního finančního ředitelství od I.CA, ze správného prostředí a k odeslané zprávě. Chybové odpovědi server nepodepisuje.
 - Zpráva nad 12 288 bajtů se neodešle (limit ověřený na playgroundu).
 - Heslo, klíč ani obsah certifikátu se nikam nelogují.
+
+## Časté otázky
+
+### Jak odeslat tržbu do EET 2.0 z C#?
+
+Nainstalujte balíček `EetKit`, načtěte pokladní certifikát `.p12` a zavolejte `EetClient.SendAsync` (viz [příklad](#příklad)). Když je výsledek `Confirmed`, vytiskněte na účtenku kód z `Pok`.
+
+### Co dělat, když EET neodpoví nebo vypadne internet?
+
+`SendAsync` počká nejvýš 5 sekund (nastavitelné, minimum 2 s) a vrátí `TemporaryError` s `IsRetryable = true`. Výjimku nevyhazuje. Tržbu pošlete znovu později se `SendOptions(PrvniZaslani: false)`. Každý pokus dostane nové `uuid_zpravy`. Frontu, která by tržby dopsílala sama, knihovna zdarma nemá.
+
+### Kde vzít certifikát?
+
+Pokladní certifikát vydává certifikační autorita CA EET. Žádá se přes daňovou informační schránku DIS+ na portálu MOJE daně. Knihovna načte soubor `.p12` tak, jak ho CA EET vydá, na Windows i Linuxu.
+
+### Jak to vyzkoušet bez ostrého certifikátu?
+
+Na playgroundu, testovacím prostředí finanční správy. Testovací certifikáty jsou v tomto repozitáři (viz [Playground](#playground)) a `EetEnvironment.Playground` je výchozí nastavení.
+
+### Co znamená chyba 4 nebo jiný kód?
+
+Kladné kódy 2 až 7 znamenají, že server zprávu odmítl. Opakování nepomůže, je potřeba opravit data nebo certifikát. Text chyby je v `ErrorText`, kód v `ErrorCode`. Kódy -1 a 8 jsou dočasné (`TemporaryError`). Přehled je v tabulce [Výsledek odeslání](#výsledek-odeslání).
+
+### Podporuje knihovna staré EET (rozhraní v3)?
+
+Ne, jen EET 2.0 s rozhraním v4.1. Staré rozhraní není s EET 2.0 kompatibilní.
+
+### Funguje to na .NET Framework?
+
+Ano, od verze 4.7.2. Automatické testy i odeslání na playground běží na .NET Framework 4.8 (viz [Instalace](#instalace)).
 
 ## Integrace na klíč
 

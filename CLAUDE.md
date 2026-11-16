@@ -12,7 +12,7 @@ Open-core .NET knihovna pro odesílání tržeb do EET 2.0 (rozhraní v4.1). Fre
 ## Ověřené technické fakty
 
 - Testovací .p12: certifikáty RC2-40, klíč 3DES. OpenSSL 3 je bez `-legacy` neotevře. Heslo je v archivu (`password_pokladni_cert_playground.txt`), nikam ho neopisovat.
-- .NET 8 a 10 tyto .p12 načtou nativně na Linuxu i Windows (testy lokálně a v CI), BouncyCastle není potřeba. .NET Framework (cíl netstandard2.0) zatím netestovaný.
+- .NET 8 a 10 tyto .p12 načtou nativně na Linuxu i Windows (testy lokálně a v CI), BouncyCastle není potřeba. .NET Framework 4.8 (cíl netstandard2.0) testovaný v CI na Windows, včetně playgroundu (16. 11. 2026). Lokálně jde net48 jen přeložit: `dotnet build -c Release -p:EetNetFramework=true`.
 - Odpovědi serveru podepisuje certifikát GFŘ od I.CA Public CA/RSA 06/2022 (kořen I.CA Root CA/RSA 05/2022). Oba certifikáty I.CA jsou přibalené v `src/EetKit/Certificates`, kořen v systémovém úložišti Linuxu není. Důvěru řeší `ServerCertificateTrust`, nikdy nic nestahuje.
 - Otisk těla: exc-c14n elementu `soapenv:Body` s deklaracemi `soapenv`, `v4`, `wsu`, SHA-256. Ručním výpočtem sedí se všemi třemi vzory.
 - Limit zprávy je 12 288 bajtů (playground 6. 11. 2026: 12 288 B projde, 12 289 B chyba 7). `SOAPAction` server bere s uvozovkami i bez.
