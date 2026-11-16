@@ -3,7 +3,7 @@
 [![CI](https://github.com/Kazalax/eetkit/actions/workflows/ci.yml/badge.svg)](https://github.com/Kazalax/eetkit/actions/workflows/ci.yml)
 [![Verified against playground](https://github.com/Kazalax/eetkit/actions/workflows/playground.yml/badge.svg)](https://github.com/Kazalax/eetkit/actions/workflows/playground.yml)
 
-EetKit is an open-source C# and .NET library for sending sales to the Czech electronic sales registration EET 2.0 (elektronická evidence tržeb, data interface v4.1, starting 1 January 2027). It validates the sale, builds and signs the data message (SOAP, WS-Security), sends it to the Financial Administration of the Czech Republic, verifies the signature of the response and returns the result with the POK code for the receipt. It is meant for developers of point-of-sale systems, e-shops and other applications that register sales.
+EetKit is an open-source C# and .NET library for sending sales to the Czech electronic sales registration EET 2.0 (elektronická evidence tržeb, data interface v4.1, mandatory from 1 January 2027, with January as a pilot period). It validates the sale, builds and signs the data message (SOAP, WS-Security), sends it to the Financial Administration of the Czech Republic, verifies the signature of the response and returns the result with the POK code for the receipt. It is meant for developers of point-of-sale systems, e-shops and other applications that register sales.
 
 [Česká verze](https://github.com/Kazalax/eetkit/blob/main/README.md)
 
@@ -125,6 +125,10 @@ Follow the [migration guide](https://github.com/Kazalax/eetkit/blob/main/docs/pr
 ### Does it work on .NET Framework?
 
 Yes, from version 4.7.2. The automated tests and sending to the playground run on .NET Framework 4.8 (see [Install](#install)).
+
+## Articles
+
+- [EET 2.0 pro vývojáře: co se změnilo proti starému EET](https://kazalax.github.io/eetkit/clanky/eet2-co-se-zmenilo-pro-vyvojare/) (in Czech): what changed for developers since the old EET
 
 ## Turnkey integration
 

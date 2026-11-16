@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
-"""Builds the GitHub Pages site from README.md: one page, so the site never says more than the README.
+"""Builds the GitHub Pages site: the home page from README.md and one page per article in site/clanky.
 
+The home page is the README itself, so the site never says more than the README.
 Usage: python3 site/build.py <output directory>. Needs npx (marked converts the markdown).
 """
+import datetime
 import html
+import json
 import pathlib
 import re
 import shutil
@@ -11,8 +14,29 @@ import subprocess
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
+SITE_URL = "https://kazalax.github.io/eetkit/"
 MARKED = "marked@16.4.2"
 HEADING = re.compile(r"<h([1-6])>(.*?)</h\1>", re.DOTALL)
+FRONT_MATTER = re.compile(r"\A---\n(.*?)\n---\n", re.DOTALL)
+
+HOME_TITLE = "EetKit: EET 2.0 pro .NET a C#"
+HOME_DESCRIPTION = (
+    "Open-source knihovna pro C# a .NET, která odesílá tržby do elektronické evidence tržeb EET 2.0 "
+    "(rozhraní v4.1): validace, podpis WS-Security, odeslání, ověření odpovědi a POK. "
+    "Testováno na .NET 8, .NET 10 a .NET Framework 4.8."
+)
+HOME_JSONLD = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareSourceCode",
+    "name": "EetKit",
+    "description": "C# and .NET library for the Czech electronic sales registration EET 2.0 (interface v4.1).",
+    "codeRepository": "https://github.com/Kazalax/eetkit",
+    "programmingLanguage": "C#",
+    "runtimePlatform": [".NET 8", ".NET 10", ".NET Framework 4.8"],
+    "license": "https://opensource.org/licenses/MIT",
+    "inLanguage": ["cs", "en"],
+    "author": {"@type": "Person", "name": "Bedřich Malý"},
+}
 
 
 def github_slug(text: str) -> str:
@@ -34,16 +58,72 @@ def add_heading_ids(body: str) -> str:
     return HEADING.sub(replace, body)
 
 
-def main() -> int:
-    output = pathlib.Path(sys.argv[1])
-    output.mkdir(parents=True, exist_ok=True)
-    body = subprocess.run(
-        ["npx", "--yes", MARKED, "--gfm", "-i", str(ROOT / "README.md")],
-        check=True, capture_output=True, text=True,
+def markdown_to_html(markdown: str) -> str:
+    return subprocess.run(
+        ["npx", "--yes", MARKED, "--gfm"], input=markdown, check=True, capture_output=True, text=True,
     ).stdout
-    page = (ROOT / "site" / "template.html").read_text(encoding="utf-8").replace("{{content}}", add_heading_ids(body))
-    (output / "index.html").write_text(page, encoding="utf-8")
-    shutil.copyfile(ROOT / "llms.txt", output / "llms.txt")
+
+
+def render(output: pathlib.Path, *, title: str, description: str, url: str, og_type: str, jsonld: dict, body: str) -> None:
+    template = (ROOT / "site" / "template.html").read_text(encoding="utf-8")
+    values = {
+        "title": html.escape(title),
+        "description": html.escape(description),
+        "url": url,
+        "og_type": og_type,
+        # "</" would end the script element early.
+        "jsonld": json.dumps(jsonld, ensure_ascii=False, indent=2).replace("</", "<\\/"),
+        "content": add_heading_ids(body),
+    }
+    page = re.sub(r"\{\{(\w+)\}\}", lambda m: values[m.group(1)], template)
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text(page, encoding="utf-8")
+
+
+def read_article(path: pathlib.Path) -> tuple[dict[str, str], str]:
+    text = path.read_text(encoding="utf-8")
+    match = FRONT_MATTER.match(text)
+    if not match:
+        raise ValueError(f"{path} nemá hlavičku ---")
+    meta = {}
+    for line in match.group(1).splitlines():
+        key, _, value = line.partition(":")
+        meta[key.strip()] = value.strip()
+    for key in ("title", "description", "date", "author"):
+        if not meta.get(key):
+            raise ValueError(f"{path}: v hlavičce chybí {key}")
+    return meta, text[match.end():]
+
+
+def build_article(path: pathlib.Path, output_dir: pathlib.Path) -> None:
+    meta, markdown = read_article(path)
+    url = f"{SITE_URL}clanky/{path.stem}/"
+    published = datetime.date.fromisoformat(meta["date"])
+    byline = f'<p class="byline">{html.escape(meta["author"])}, {published.day}. {published.month}. {published.year}</p>'
+    body = markdown_to_html(markdown).replace("</h1>", "</h1>\n" + byline, 1)
+    jsonld = {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": meta["title"],
+        "description": meta["description"],
+        "datePublished": meta["date"],
+        "inLanguage": "cs",
+        "author": {"@type": "Person", "name": meta["author"]},
+        "about": {"@type": "SoftwareSourceCode", "name": "EetKit", "codeRepository": "https://github.com/Kazalax/eetkit"},
+        "url": url,
+    }
+    render(output_dir / "clanky" / path.stem / "index.html", title=meta["title"], description=meta["description"],
+           url=url, og_type="article", jsonld=jsonld, body=body)
+
+
+def main() -> int:
+    output_dir = pathlib.Path(sys.argv[1])
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    render(output_dir / "index.html", title=HOME_TITLE, description=HOME_DESCRIPTION, url=SITE_URL,
+           og_type="website", jsonld=HOME_JSONLD, body=markdown_to_html(readme))
+    for article in sorted((ROOT / "site" / "clanky").glob("*.md")):
+        build_article(article, output_dir)
+    shutil.copyfile(ROOT / "llms.txt", output_dir / "llms.txt")
     return 0
 
 

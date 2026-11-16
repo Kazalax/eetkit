@@ -1,6 +1,6 @@
 # EetKit
 
-> EetKit is an open-source (MIT) C# and .NET library for the Czech electronic sales registration EET 2.0 (elektronická evidence tržeb, data interface v4.1, starting 1 January 2027). It validates a sale, signs the SOAP message with WS-Security, sends it to the Financial Administration of the Czech Republic (playground or production), verifies the signed response and returns the POK code. NuGet packages: `EetKit` and `EetKit.Extensions.DependencyInjection`. Targets .NET 8, .NET 10 and netstandard2.0 (tested on .NET Framework 4.8). Not an official product of the Financial Administration.
+> EetKit is an open-source (MIT) C# and .NET library for the Czech electronic sales registration EET 2.0 (elektronická evidence tržeb, data interface v4.1, mandatory from 1 January 2027, January is a pilot period). It validates a sale, signs the SOAP message with WS-Security, sends it to the Financial Administration of the Czech Republic (playground or production), verifies the signed response and returns the POK code. NuGet packages: `EetKit` and `EetKit.Extensions.DependencyInjection`. Targets .NET 8, .NET 10 and netstandard2.0 (tested on .NET Framework 4.8). Not an official product of the Financial Administration.
 
 Key facts:
 

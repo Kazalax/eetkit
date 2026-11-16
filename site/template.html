@@ -3,26 +3,15 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>EetKit: EET 2.0 pro .NET a C#</title>
-  <meta name="description" content="Open-source knihovna pro C# a .NET, která odesílá tržby do elektronické evidence tržeb EET 2.0 (rozhraní v4.1): validace, podpis WS-Security, odeslání, ověření odpovědi a POK. Testováno na .NET 8, .NET 10 a .NET Framework 4.8.">
-  <link rel="canonical" href="https://kazalax.github.io/eetkit/">
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="EetKit: EET 2.0 pro .NET a C#">
-  <meta property="og:description" content="Odesílání tržeb do EET 2.0 z C# a .NET. Open source, MIT, ověřeno proti playgroundu finanční správy.">
-  <meta property="og:url" content="https://kazalax.github.io/eetkit/">
+  <title>{{title}}</title>
+  <meta name="description" content="{{description}}">
+  <link rel="canonical" href="{{url}}">
+  <meta property="og:type" content="{{og_type}}">
+  <meta property="og:title" content="{{title}}">
+  <meta property="og:description" content="{{description}}">
+  <meta property="og:url" content="{{url}}">
   <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "SoftwareSourceCode",
-    "name": "EetKit",
-    "description": "C# and .NET library for the Czech electronic sales registration EET 2.0 (interface v4.1).",
-    "codeRepository": "https://github.com/Kazalax/eetkit",
-    "programmingLanguage": "C#",
-    "runtimePlatform": [".NET 8", ".NET 10", ".NET Framework 4.8"],
-    "license": "https://opensource.org/licenses/MIT",
-    "inLanguage": ["cs", "en"],
-    "author": { "@type": "Person", "name": "Bedřich Malý" }
-  }
+{{jsonld}}
   </script>
   <style>
     :root {
@@ -59,6 +48,7 @@
     table { display: block; overflow-x: auto; border-collapse: collapse; margin: 0 0 1rem; }
     th, td { border: 1px solid var(--line); padding: 0.5rem 0.75rem; text-align: left; vertical-align: top; }
     th { background: var(--surface); }
+    .byline { color: var(--muted); margin: -0.5rem 0 1.5rem; }
     footer { max-width: 48rem; margin: 3rem auto 0; color: var(--muted); font-size: 0.9375rem; }
   </style>
 </head>
@@ -67,7 +57,7 @@
 {{content}}
 </main>
 <footer>
-  <p>Stránka se generuje z <a href="https://github.com/Kazalax/eetkit/blob/main/README.md">README</a> v repozitáři. Balíček na <a href="https://www.nuget.org/packages/EetKit">NuGetu</a>.</p>
+  <p><a href="https://kazalax.github.io/eetkit/">EetKit</a>: EET 2.0 pro .NET a C#. Zdrojový kód na <a href="https://github.com/Kazalax/eetkit">GitHubu</a>, balíček na <a href="https://www.nuget.org/packages/EetKit">NuGetu</a>.</p>
 </footer>
 </body>
 </html>

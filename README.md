@@ -3,7 +3,7 @@
 [![CI](https://github.com/Kazalax/eetkit/actions/workflows/ci.yml/badge.svg)](https://github.com/Kazalax/eetkit/actions/workflows/ci.yml)
 [![Ověřeno proti playgroundu](https://github.com/Kazalax/eetkit/actions/workflows/playground.yml/badge.svg)](https://github.com/Kazalax/eetkit/actions/workflows/playground.yml)
 
-EetKit je open-source knihovna pro C# a .NET, která odesílá tržby do elektronické evidence tržeb EET 2.0 (datové rozhraní v4.1, evidence startuje 1. 1. 2027). Zkontroluje data tržby, sestaví a podepíše datovou zprávu (SOAP, WS-Security), pošle ji Finanční správě ČR, ověří podpis odpovědi a vrátí výsledek s kódem POK pro účtenku. Je určená pro vývojáře pokladních systémů, e-shopů a dalších aplikací, které tržby evidují.
+EetKit je open-source knihovna pro C# a .NET, která odesílá tržby do elektronické evidence tržeb EET 2.0 (datové rozhraní v4.1, povinnost evidovat platí od 1. 1. 2027, leden je pilotní provoz). Zkontroluje data tržby, sestaví a podepíše datovou zprávu (SOAP, WS-Security), pošle ji Finanční správě ČR, ověří podpis odpovědi a vrátí výsledek s kódem POK pro účtenku. Je určená pro vývojáře pokladních systémů, e-shopů a dalších aplikací, které tržby evidují.
 
 [English version](https://github.com/Kazalax/eetkit/blob/main/README.en.md)
 
@@ -123,6 +123,10 @@ Podle [návodu na přechod](https://github.com/Kazalax/eetkit/blob/main/docs/pre
 ### Funguje to na .NET Framework?
 
 Ano, od verze 4.7.2. Automatické testy i odeslání na playground běží na .NET Framework 4.8 (viz [Instalace](#instalace)).
+
+## Články
+
+- [EET 2.0 pro vývojáře: co se změnilo proti starému EET](https://kazalax.github.io/eetkit/clanky/eet2-co-se-zmenilo-pro-vyvojare/)
 
 ## Integrace na klíč
 
