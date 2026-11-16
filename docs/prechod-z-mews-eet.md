@@ -1,6 +1,6 @@
 # Přechod z Mews.Fiscalizations.Czechia na EetKit
 
-Knihovna [Mews.Fiscalizations.Czechia](https://www.nuget.org/packages/Mews.Fiscalizations.Czechia/) (jmenný prostor `Mews.Eet`) odesílala tržby do původního EET s rozhraním v3. Poslední verze 5.0.2 vyšla v říjnu 2022 a v lednu 2023 Mews projekt ze svého repozitáře odstranil. EET 2.0 používá rozhraní v4.1, které se starým není kompatibilní, takže aplikace postavené na Mews musí odesílání přepsat. Tenhle návod ukazuje, co čemu odpovídá.
+Knihovna [Mews.Fiscalizations.Czechia](https://www.nuget.org/packages/Mews.Fiscalizations.Czechia/) (jmenný prostor `Mews.Eet`) odesílala tržby do původního EET s rozhraním v3. Poslední verze 5.0.2 vyšla v říjnu 2022 a v lednu 2023 Mews projekt ze svého repozitáře odstranil. EET 2.0 používá rozhraní v4.1, které se starým není kompatibilní, takže aplikace postavené na Mews musí odesílání přepsat.
 
 ## Instalace
 

@@ -5,7 +5,7 @@
     <RootNamespace>EetKit.Extensions.DependencyInjection</RootNamespace>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageId>EetKit.Extensions.DependencyInjection</PackageId>
-    <Title>EET 2.0 pro .NET – registrace do DI</Title>
+    <Title>EET 2.0 pro .NET: registrace do DI</Title>
     <Description>Registrace EetKit do Microsoft.Extensions.DependencyInjection: services.AddEet(...), IHttpClientFactory, kontrola nastavení při startu. Registers EetKit (Czech EET 2.0) in Microsoft DI.</Description>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>

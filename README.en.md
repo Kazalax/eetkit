@@ -82,7 +82,7 @@ builder.Services.AddEet(o =>
 });
 ```
 
-`EetClient` is a single shared instance; take it in your constructor. At startup the settings are validated and the certificate is opened, so a wrong path or password stops the application. Register your own certificate source (a key vault, for example) as `IEetCertificateProvider`.
+`AddEet` registers `EetClient` as a single shared instance that you take in your constructor. At startup the settings are validated and the certificate is opened, so a wrong path or password stops the application. Register your own certificate source (a key vault, for example) as `IEetCertificateProvider`.
 
 ## What the library takes care of
 

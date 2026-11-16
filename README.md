@@ -80,7 +80,7 @@ builder.Services.AddEet(o =>
 });
 ```
 
-`EetClient` je jedna sdílená instance, nechte si ji předat do konstruktoru. Při startu aplikace se zkontroluje nastavení a certifikát se zkusí otevřít, takže špatná cesta nebo heslo zastaví start. Vlastní zdroj certifikátu (například trezor klíčů) zaregistrujte jako `IEetCertificateProvider`.
+`AddEet` zaregistruje `EetClient` jako jednu sdílenou instanci, kterou si necháte předat do konstruktoru. Při startu aplikace se zkontroluje nastavení a certifikát se zkusí otevřít, takže špatná cesta nebo heslo zastaví start. Vlastní zdroj certifikátu (například trezor klíčů) zaregistrujte jako `IEetCertificateProvider`.
 
 ## Co knihovna hlídá
 
