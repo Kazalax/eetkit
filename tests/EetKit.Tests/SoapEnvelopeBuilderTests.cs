@@ -107,7 +107,7 @@ public sealed class SoapEnvelopeBuilderTests
         Assert.Matches(@"\AKI-[0-9A-F]{33}\z", ids.KeyInfo);
         Assert.Matches(@"\ASTR-[0-9A-F]{33}\z", ids.TokenReference);
         Assert.Matches(@"\Aid-[0-9A-F]{33}\z", ids.Body);
-        Assert.NotEqual(ids.Token[5..], ids.Body[3..]);
+        Assert.NotEqual(ids.Token.Substring(5), ids.Body.Substring(3));
     }
 
     private static XmlElement Element(XmlDocument document, string localName) =>

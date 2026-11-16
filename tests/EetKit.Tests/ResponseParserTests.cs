@@ -40,7 +40,7 @@ public sealed class ResponseParserTests
     public void PlaygroundConfirmation_TamperedPok_TemporaryError()
     {
         var body = Encoding.UTF8.GetString(Fixtures.Bytes(Fixtures.Potvrzeni))
-            .Replace("3efd94d7-2afb-401d-b213-986a62bcae55-ff", "00000000-0000-4000-8000-000000000000-ff", StringComparison.Ordinal);
+            .Replace("3efd94d7-2afb-401d-b213-986a62bcae55-ff", "00000000-0000-4000-8000-000000000000-ff");
 
         var result = ResponseParser.Parse(Encoding.UTF8.GetBytes(body), Context());
 
@@ -73,8 +73,8 @@ public sealed class ResponseParserTests
     public void PlaygroundError4_OtherPrefix_SameResult()
     {
         var body = Encoding.UTF8.GetString(Fixtures.Bytes(Fixtures.Chyba4))
-            .Replace("eet:", "v4:", StringComparison.Ordinal)
-            .Replace("xmlns:eet=", "xmlns:v4=", StringComparison.Ordinal);
+            .Replace("eet:", "v4:")
+            .Replace("xmlns:eet=", "xmlns:v4=");
 
         var result = ResponseParser.Parse(Encoding.UTF8.GetBytes(body), Context());
 
@@ -140,7 +140,7 @@ public sealed class ResponseParserTests
         var result = ResponseParser.Parse(fault, Context());
 
         Assert.Equal(EetStatus.TemporaryError, result.Status);
-        Assert.Contains("Internal error", result.ErrorText, StringComparison.Ordinal);
+        Assert.Contains("Internal error", result.ErrorText);
     }
 
     [Theory]
@@ -158,7 +158,7 @@ public sealed class ResponseParserTests
     [Fact]
     public void ErrorWithInvalidTestFlag_ClassifiedWithoutException()
     {
-        var body = Encoding.UTF8.GetString(ErrorResponse(4)).Replace("test=\"true\"", "test=\"ano\"", StringComparison.Ordinal);
+        var body = Encoding.UTF8.GetString(ErrorResponse(4)).Replace("test=\"true\"", "test=\"ano\"");
 
         var result = ResponseParser.Parse(Encoding.UTF8.GetBytes(body), Context());
 
@@ -172,7 +172,7 @@ public sealed class ResponseParserTests
         // KeyInfo is not signed, so anyone on the way could add a second reference.
         var body = Encoding.UTF8.GetString(Fixtures.Bytes(Fixtures.Potvrzeni));
         var reference = System.Text.RegularExpressions.Regex.Match(body, "<wsse:Reference [^>]*/>").Value;
-        body = body.Replace(reference, reference + reference, StringComparison.Ordinal);
+        body = body.Replace(reference, reference + reference);
 
         var result = ResponseParser.Parse(Encoding.UTF8.GetBytes(body), Context());
 
@@ -195,7 +195,7 @@ public sealed class ResponseParserTests
             var result = ResponseParser.Parse(body, Context());
 
             Assert.Equal(EetStatus.TemporaryError, result.Status);
-            Assert.DoesNotContain(Secret, result.ErrorText ?? string.Empty, StringComparison.Ordinal);
+            Assert.DoesNotContain(Secret, result.ErrorText ?? string.Empty);
         }
         finally
         {

@@ -124,7 +124,7 @@ public sealed class DependencyInjectionTests
 
         var resolve = Task.Run(() => provider.GetRequiredService<EetClient>(), TestContext.Current.CancellationToken);
 
-        Assert.NotNull(await resolve.WaitAsync(TimeSpan.FromSeconds(10), TestContext.Current.CancellationToken));
+        Assert.NotNull(await resolve.WaitAsync(TimeSpan.FromSeconds(10), TimeProvider.System, TestContext.Current.CancellationToken));
     }
 
     private sealed class ProviderUsingOptions(IOptions<EetOptions> options) : IEetCertificateProvider

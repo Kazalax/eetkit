@@ -16,12 +16,7 @@ internal sealed record SampleRequest(
 {
     private const string Wsu = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd";
 
-    public static XmlDocument LoadDocument(string eic)
-    {
-        var document = new XmlDocument { PreserveWhitespace = true };
-        document.Load(SpecFiles.Path($"{eic}.eet.v4.req.xml"));
-        return document;
-    }
+    public static XmlDocument LoadDocument(string eic) => TestXml.FromFile(SpecFiles.Path($"{eic}.eet.v4.req.xml"));
 
     public static SampleRequest Load(string eic)
     {

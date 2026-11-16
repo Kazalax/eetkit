@@ -15,10 +15,5 @@ internal static class Fixtures
 
     public static byte[] Bytes(string name) => File.ReadAllBytes(Path(name));
 
-    public static XmlDocument Document(string name)
-    {
-        var document = new XmlDocument { PreserveWhitespace = true };
-        document.Load(Path(name));
-        return document;
-    }
+    public static XmlDocument Document(string name) => TestXml.FromFile(Path(name));
 }

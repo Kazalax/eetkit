@@ -10,7 +10,17 @@ jobs:
   playground:
     # Forks must not send to the playground on their own schedule.
     if: github.repository == 'Kazalax/eetkit'
-    runs-on: ubuntu-latest
+    name: ${{ matrix.os }} / ${{ matrix.framework }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            framework: net10.0
+          # .NET Framework uses the netstandard2.0 build and its own certificate trust path.
+          - os: windows-latest
+            framework: net48
     steps:
       - uses: actions/checkout@v7
 
@@ -23,4 +33,4 @@ jobs:
       - name: Test against playground
         env:
           EET_PLAYGROUND: "1"
-        run: dotnet test --project tests/EetKit.PlaygroundTests -c Release -f net10.0
+        run: dotnet test --project tests/EetKit.PlaygroundTests -c Release -f ${{ matrix.framework }}

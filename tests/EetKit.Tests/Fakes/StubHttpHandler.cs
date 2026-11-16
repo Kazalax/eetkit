@@ -28,7 +28,11 @@ internal sealed class StubHttpHandler : HttpMessageHandler
 
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
+#if NETFRAMEWORK
+        var body = request.Content is null ? [] : await request.Content.ReadAsByteArrayAsync();
+#else
         var body = request.Content is null ? [] : await request.Content.ReadAsByteArrayAsync(cancellationToken);
+#endif
         Requests.Add(new RecordedRequest(
             request.Method,
             request.RequestUri,

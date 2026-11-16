@@ -58,6 +58,32 @@ public sealed class ServerCertificateTrustTests
     }
 
     [Fact]
+    public void ForgedChainWithIcaNames_NotTrusted()
+    {
+        // An attacker copies the I.CA names into their own root and issuer; only the keys differ.
+        var notBefore = Fixtures.CapturedAt.AddDays(-1);
+        var notAfter = Fixtures.CapturedAt.AddDays(30);
+        using var rootKey = RSA.Create(2048);
+        using var issuerKey = RSA.Create(2048);
+        using var signerKey = RSA.Create(2048);
+
+        var rootRequest = new CertificateRequest(ServerCertificateTrust.Root.SubjectName, rootKey, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
+        rootRequest.CertificateExtensions.Add(new X509BasicConstraintsExtension(certificateAuthority: true, hasPathLengthConstraint: false, pathLengthConstraint: 0, critical: true));
+        using var root = rootRequest.CreateSelfSigned(notBefore, notAfter);
+
+        var issuerRequest = new CertificateRequest(ServerCertificateTrust.Issuer.SubjectName, issuerKey, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
+        issuerRequest.CertificateExtensions.Add(new X509BasicConstraintsExtension(certificateAuthority: true, hasPathLengthConstraint: false, pathLengthConstraint: 0, critical: true));
+        using var issuer = issuerRequest.Create(root, notBefore, notAfter, [1]).CopyWithPrivateKey(issuerKey);
+
+        var signerRequest = new CertificateRequest(
+            "CN=Podvrh, O=Generální finanční ředitelství, C=CZ", signerKey, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
+        signerRequest.CertificateExtensions.Add(new X509KeyUsageExtension(X509KeyUsageFlags.DigitalSignature, critical: true));
+        using var forged = signerRequest.Create(issuer, notBefore, notAfter, [2]);
+
+        Assert.False(ServerCertificateTrust.IsTrusted(forged, Fixtures.CapturedAt));
+    }
+
+    [Fact]
     public void HasRequiredOrganization_PlaygroundSigner_True()
     {
         var token = Fixtures.Document(Fixtures.Potvrzeni)
@@ -67,6 +93,7 @@ public sealed class ServerCertificateTrustTests
         Assert.True(ServerCertificateTrust.HasRequiredOrganization(signer));
     }
 
+#if NET7_0_OR_GREATER // X500DistinguishedNameBuilder; the DER reader under test is the same code on every target
     [Fact]
     public void HasRequiredOrganization_NewlineInCommonName_False()
     {
@@ -79,6 +106,7 @@ public sealed class ServerCertificateTrustTests
 
         Assert.False(ServerCertificateTrust.HasRequiredOrganization(forged));
     }
+#endif
 
     [Fact]
     public void BundledIssuerItself_NotTrustedAsSigner()
@@ -124,8 +152,16 @@ public sealed class ServerCertificateTrustTests
         Assert.True(WsSecurityVerifier.Verify(document));
     }
 
+#if NETFRAMEWORK
+    private static string Sha256(X509Certificate2 certificate)
+    {
+        using var sha = SHA256.Create();
+        return BitConverter.ToString(sha.ComputeHash(certificate.RawData)).Replace("-", "");
+    }
+#else
     private static string Sha256(X509Certificate2 certificate) =>
         Convert.ToHexString(SHA256.HashData(certificate.RawData));
+#endif
 
     // Signs the sample body with SignedXml and the given algorithms, in the WS-Security shape
     // the verifier expects (token, reference to the token, signature in the Security header).

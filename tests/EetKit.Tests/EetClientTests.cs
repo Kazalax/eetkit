@@ -39,9 +39,7 @@ public sealed class EetClientTests : IDisposable
 
     private static XmlDocument SentDocument(StubHttpHandler handler, int index = 0)
     {
-        var document = new XmlDocument { PreserveWhitespace = true };
-        document.LoadXml(Encoding.UTF8.GetString(handler.Requests[index].Body));
-        return document;
+        return TestXml.FromString(Encoding.UTF8.GetString(handler.Requests[index].Body));
     }
 
     private static XmlElement SentElement(StubHttpHandler handler, string localName, int index = 0) =>
@@ -173,7 +171,7 @@ public sealed class EetClientTests : IDisposable
     [Theory]
     [InlineData(HttpStatusCode.InternalServerError, EetStatus.TemporaryError)]
     [InlineData(HttpStatusCode.ServiceUnavailable, EetStatus.TemporaryError)]
-    [InlineData(HttpStatusCode.TooManyRequests, EetStatus.TemporaryError)]
+    [InlineData((HttpStatusCode)429, EetStatus.TemporaryError)] // TooManyRequests; the name is missing on .NET Framework
     [InlineData(HttpStatusCode.RequestTimeout, EetStatus.TemporaryError)]
     [InlineData(HttpStatusCode.NotFound, EetStatus.TemporaryError)]
     [InlineData(HttpStatusCode.MethodNotAllowed, EetStatus.TemporaryError)]
@@ -194,7 +192,11 @@ public sealed class EetClientTests : IDisposable
         using var cancellation = new CancellationTokenSource();
         var handler = new StubHttpHandler(async (_, token) =>
         {
+#if NETFRAMEWORK
+            cancellation.Cancel();
+#else
             await cancellation.CancelAsync();
+#endif
             await Task.Delay(Timeout.Infinite, token);
             return new HttpResponseMessage(HttpStatusCode.OK);
         });

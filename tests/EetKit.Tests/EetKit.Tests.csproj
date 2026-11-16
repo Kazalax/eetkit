@@ -2,6 +2,8 @@
 
   <PropertyGroup>
     <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
+    <!-- .NET Framework runs only on Windows; elsewhere it is compiled on request (-p:EetNetFramework=true). -->
+    <TargetFrameworks Condition="'$(OS)' == 'Windows_NT' Or '$(EetNetFramework)' == 'true'">$(TargetFrameworks);net48</TargetFrameworks>
     <OutputType>Exe</OutputType>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
@@ -9,6 +11,13 @@
 
   <ItemGroup>
     <PackageReference Include="xunit.v3" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.IO.Compression" />
+    <!-- The SDK adds this implicit using only for .NET (Core). -->
+    <Using Include="System.Net.Http" />
   </ItemGroup>
 
   <ItemGroup>
