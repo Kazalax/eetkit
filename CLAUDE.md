@@ -35,4 +35,6 @@ Rozhodnutí oproti zadání jsou v plánu M1, sekce „Rozhodnutí oproti zadán
 - Build: `dotnet build -c Release`
 - Testy: `dotnet test -c Release` (xUnit v3 na Microsoft.Testing.Platform, zapnuto v `global.json`; filtr např. `--filter-class EetKit.Tests.SampleSignatureTests`)
 - Akceptační test podpisu: `SampleSignatureTests.Sign_MatchesSample` (shoda se třemi vzory finanční správy)
+- Vydání na NuGet: zvednout `<Version>` v `Directory.Build.props`, datum v `CHANGELOG.md`, pak `git tag -a vX.Y.Z` a push tagu. Workflow `release.yml` otestuje, zabalí a pošle přes Trusted Publishing (bez API klíče). Tag pushovat jen po výslovném souhlasu uživatele.
+- Web https://kazalax.github.io/eetkit/ se generuje z `README.md` (`python3 site/build.py _site`, workflow `pages.yml`). Co má být na webu, patří do README.
 - Playground testy: `EET_PLAYGROUND=1 dotnet test --project tests/EetKit.PlaygroundTests -c Release -f net10.0` (skutečný server FS; v CI každou noc, workflow `playground.yml`)
