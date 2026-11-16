@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EetKit: EET 2.0 pro .NET a C#</title>
+  <meta name="description" content="Open-source knihovna pro C# a .NET, která odesílá tržby do elektronické evidence tržeb EET 2.0 (rozhraní v4.1): validace, podpis WS-Security, odeslání, ověření odpovědi a POK. Testováno na .NET 8, .NET 10 a .NET Framework 4.8.">
+  <link rel="canonical" href="https://kazalax.github.io/eetkit/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="EetKit: EET 2.0 pro .NET a C#">
+  <meta property="og:description" content="Odesílání tržeb do EET 2.0 z C# a .NET. Open source, MIT, ověřeno proti playgroundu finanční správy.">
+  <meta property="og:url" content="https://kazalax.github.io/eetkit/">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareSourceCode",
+    "name": "EetKit",
+    "description": "C# and .NET library for the Czech electronic sales registration EET 2.0 (interface v4.1).",
+    "codeRepository": "https://github.com/Kazalax/eetkit",
+    "programmingLanguage": "C#",
+    "runtimePlatform": [".NET 8", ".NET 10", ".NET Framework 4.8"],
+    "license": "https://opensource.org/licenses/MIT",
+    "inLanguage": ["cs", "en"],
+    "author": { "@type": "Person", "name": "Bedřich Malý" }
+  }
+  </script>
+  <style>
+    :root {
+      --bg: #f6f7f9; --surface: #ffffff; --ink: #18212b; --muted: #5a6672; --line: #d5dbe1;
+      --accent: #1c5a8c; --code-bg: #eef1f4;
+      color-scheme: light;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #10161c; --surface: #172029; --ink: #e5eaef; --muted: #9ba8b4; --line: #2b3742;
+        --accent: #84b6e2; --code-bg: #1d2832;
+        color-scheme: dark;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; background: var(--bg); color: var(--ink);
+      font: 1.0625rem/1.6 system-ui, "Segoe UI", sans-serif;
+      padding: 2rem 1rem 4rem;
+    }
+    main { max-width: 48rem; margin: 0 auto; }
+    h1 { font-size: 2rem; line-height: 1.25; margin: 0 0 1rem; }
+    h2 { font-size: 1.5rem; margin: 2.5rem 0 0.75rem; padding-top: 1rem; border-top: 1px solid var(--line); }
+    h3 { font-size: 1.125rem; margin: 1.75rem 0 0.5rem; }
+    p, ul { margin: 0 0 1rem; }
+    a { color: var(--accent); }
+    a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    img { vertical-align: middle; }
+    blockquote { margin: 1rem 0; padding: 0.75rem 1rem; background: var(--surface); border-left: 0.25rem solid var(--line); color: var(--muted); }
+    blockquote p { margin: 0; }
+    code { font-family: ui-monospace, Consolas, monospace; font-size: 0.9em; background: var(--code-bg); padding: 0.1em 0.3em; border-radius: 0.25rem; }
+    pre { background: var(--surface); border: 1px solid var(--line); border-radius: 0.5rem; padding: 1rem; overflow-x: auto; }
+    pre code { background: none; padding: 0; font-size: 0.875rem; }
+    table { display: block; overflow-x: auto; border-collapse: collapse; margin: 0 0 1rem; }
+    th, td { border: 1px solid var(--line); padding: 0.5rem 0.75rem; text-align: left; vertical-align: top; }
+    th { background: var(--surface); }
+    footer { max-width: 48rem; margin: 3rem auto 0; color: var(--muted); font-size: 0.9375rem; }
+  </style>
+</head>
+<body>
+<main>
+{{content}}
+</main>
+<footer>
+  <p>Stránka se generuje z <a href="https://github.com/Kazalax/eetkit/blob/main/README.md">README</a> v repozitáři. Balíček na <a href="https://www.nuget.org/packages/EetKit">NuGetu</a>.</p>
+</footer>
+</body>
+</html>
