@@ -112,6 +112,10 @@ Positive codes 2 to 7 mean that the server rejected the message. Retrying will n
 
 No, only EET 2.0 with interface v4.1. The old interface is not compatible with EET 2.0.
 
+### How do I migrate from Mews.Fiscalizations.Czechia (Mews.Eet)?
+
+Follow the [migration guide](https://github.com/Kazalax/eetkit/blob/main/docs/prechod-z-mews-eet.md) (in Czech). It has the code before and after, a table mapping the old types to the new ones, and what EET 2.0 dropped (VAT, BKP, PKP).
+
 ### Does it work on .NET Framework?
 
 Yes, from version 4.7.2. The automated tests and sending to the playground run on .NET Framework 4.8 (see [Install](#install)).

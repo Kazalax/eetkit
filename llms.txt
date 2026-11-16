@@ -15,6 +15,7 @@ Key facts:
 
 - [README (Czech)](https://github.com/Kazalax/eetkit/blob/main/README.md): installation, example, result statuses, playground, ASP.NET Core, FAQ
 - [README (English)](https://github.com/Kazalax/eetkit/blob/main/README.en.md): the same in English
+- [Migration from Mews.Fiscalizations.Czechia (Czech)](https://github.com/Kazalax/eetkit/blob/main/docs/prechod-z-mews-eet.md): maps the old Mews.Eet API (EET v3) to EetKit (EET 2.0)
 - [Changelog](https://github.com/Kazalax/eetkit/blob/main/CHANGELOG.md)
 
 ## Examples

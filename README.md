@@ -110,6 +110,10 @@ Kladné kódy 2 až 7 znamenají, že server zprávu odmítl. Opakování nepom�
 
 Ne, jen EET 2.0 s rozhraním v4.1. Staré rozhraní není s EET 2.0 kompatibilní.
 
+### Jak přejít z knihovny Mews.Fiscalizations.Czechia (Mews.Eet)?
+
+Podle [návodu na přechod](https://github.com/Kazalax/eetkit/blob/main/docs/prechod-z-mews-eet.md). Je v něm srovnání kódu před a po, tabulka, co čemu odpovídá, a co v EET 2.0 zmizelo (DPH, BKP, PKP).
+
 ### Funguje to na .NET Framework?
 
 Ano, od verze 4.7.2. Automatické testy i odeslání na playground běží na .NET Framework 4.8 (viz [Instalace](#instalace)).
