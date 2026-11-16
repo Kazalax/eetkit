@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/samples/">
     <Project Path="samples/EetKit.Sample.AspNetCore/EetKit.Sample.AspNetCore.csproj" />
+    <Project Path="samples/EetKit.Sample.WinForms/EetKit.Sample.WinForms.csproj" />
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/EetKit.Extensions.DependencyInjection/EetKit.Extensions.DependencyInjection.csproj" />

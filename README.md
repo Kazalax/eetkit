@@ -63,6 +63,12 @@ dotnet run --project samples/EetKit.Sample.AspNetCore
 
 Pak otevřete http://localhost:5080.
 
+Pro pokladny na .NET Frameworku je tu ukázka ve WinForms (spustí se jen na Windows):
+
+```bash
+dotnet run --project samples/EetKit.Sample.WinForms
+```
+
 ## ASP.NET Core
 
 ```csharp

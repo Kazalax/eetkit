@@ -65,6 +65,12 @@ dotnet run --project samples/EetKit.Sample.AspNetCore
 
 Then open http://localhost:5080.
 
+For point-of-sale apps on .NET Framework there is a WinForms sample (runs on Windows only):
+
+```bash
+dotnet run --project samples/EetKit.Sample.WinForms
+```
+
 ## ASP.NET Core
 
 ```csharp
