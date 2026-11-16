@@ -78,7 +78,7 @@ builder.Services.AddEet(o =>
 
 ## Integrace na klíč
 
-Potřebujete EET zapojit do vlastní pokladny, frontu tržeb pro výpadky sítě nebo automatickou obnovu certifikátů? Kontakt bude doplněn.
+Potřebujete EET zapojit do vlastní pokladny, frontu tržeb pro výpadky sítě nebo automatickou obnovu certifikátů? Napište na bedrichmaly79@gmail.com.
 
 ## Licence
 
