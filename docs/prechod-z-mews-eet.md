@@ -155,7 +155,13 @@ Mews podpis odpovědi neověřoval, jeho README to uvádělo jako známý probl�
 
 ### Certifikát jako pole bajtů
 
-Mews bral obsah `.p12` jako `byte[]`. `EetClient.FromPkcs12` bere cestu k souboru. Když máte certifikát uložený jinde, třeba v databázi, nabízí balíček `EetKit.Extensions.DependencyInjection` možnost `EetOptions.CertificateBytes`. Pro vlastní úložiště můžete také zaregistrovat `IEetCertificateProvider`.
+Mews bral obsah `.p12` jako `byte[]`. EetKit ho bere taky, stačí místo cesty předat bajty:
+
+```csharp
+using var client = EetClient.FromPkcs12(bajty, heslo, EetEnvironment.Playground);
+```
+
+V aplikaci s DI to samé dělá `EetOptions.CertificateBytes` z balíčku `EetKit.Extensions.DependencyInjection`. Pro vlastní úložiště můžete také zaregistrovat `IEetCertificateProvider`.
 
 ## Co dál
 

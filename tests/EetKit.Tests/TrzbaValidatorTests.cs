@@ -21,13 +21,13 @@ public sealed class TrzbaValidatorTests
         CerpZuct = 302.00m,
     };
 
-    private static TrzbaValidationResult Validate(
+    private static EetValidationResult Validate(
         Trzba trzba,
         EetEnvironment environment = EetEnvironment.Playground,
         DateTimeOffset? now = null) =>
         TrzbaValidator.Validate(trzba, environment, now ?? Now);
 
-    private static string ErrorField(TrzbaValidationResult result) => Assert.Single(result.Errors).Field;
+    private static string ErrorField(EetValidationResult result) => Assert.Single(result.Errors).Field;
 
     [Fact]
     public void SampleData_NoErrorsNoWarnings()

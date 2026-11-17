@@ -40,6 +40,8 @@ else if (result.IsRetryable)
     Console.WriteLine("Send again later with new SendOptions(PrvniZaslani: false)");
 ```
 
+A certificate stored somewhere other than a file, a database for example, loads with `EetClient.FromPkcs12(bytes, password, EetEnvironment.Playground)`.
+
 Sale fields keep the Czech names from the official specification (`celk_trzba` is `CelkTrzba`, `porad_cis` is `PoradCis`), so they map one to one to the documentation of the Financial Administration.
 
 ## Send result
@@ -83,6 +85,8 @@ builder.Services.AddEet(o =>
 ```
 
 `AddEet` registers `EetClient` as a single shared instance that you take in your constructor. At startup the settings are validated and the certificate is opened, so a wrong path or password stops the application. Register your own certificate source (a key vault, for example) as `IEetCertificateProvider`.
+
+The client is also registered as `IEetClient`. In tests of code that sends sales, replace it with your own implementation and create its results with `EetModelFactory.Result(...)`.
 
 ## What the library takes care of
 

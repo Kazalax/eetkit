@@ -4,6 +4,15 @@ Formát podle [Keep a Changelog](https://keepachangelog.com/cs/1.1.0/), verze po
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-17
+
+### Přidáno
+
+- Rozhraní `IEetClient` (`Validate` a `SendAsync`), které `EetClient` implementuje. `AddEet` ho registruje jako stejnou sdílenou instanci jako `EetClient`.
+- `EetClient.Validate`: kontrola dat tržby bez odeslání, výsledek `EetValidationResult` s chybami a místními varováními.
+- `EetClient.FromPkcs12(byte[], heslo, prostředí)`: klient s certifikátem z obsahu souboru .p12, například z databáze.
+- `EetModelFactory.Result(...)`: vytvoří `EetResult` s libovolnými hodnotami pro testy kódu, který EetKit používá.
+
 ## [0.1.0] - 2026-11-16
 
 ### Přidáno

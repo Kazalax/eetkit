@@ -2,10 +2,6 @@ using System.Text.RegularExpressions;
 
 namespace EetKit.Internal;
 
-internal sealed record TrzbaValidationResult(
-    IReadOnlyList<EetValidationError> Errors,
-    IReadOnlyList<string> Warnings);
-
 /// <summary>
 /// Checks sale data before sending. Errors follow the XSD (the server would reject the message),
 /// warnings follow the server's pass-through checks (popis rozhraní 2.2.4: POK is still issued).
@@ -33,7 +29,7 @@ internal static class TrzbaValidator
     private static readonly Regex IdPoklPattern = new(@"\A[0-9a-zA-Z\.,:;/#\-_ ]{1,20}\z", RegexOptions.CultureInvariant);
     private static readonly Regex PoradCisPattern = new(@"\A[0-9a-zA-Z\.,:;/#\-_ ]{1,25}\z", RegexOptions.CultureInvariant);
 
-    public static TrzbaValidationResult Validate(Trzba trzba, EetEnvironment environment, DateTimeOffset now)
+    public static EetValidationResult Validate(Trzba trzba, EetEnvironment environment, DateTimeOffset now)
     {
         Guard.NotNull(trzba, nameof(trzba));
 
@@ -60,7 +56,7 @@ internal static class TrzbaValidator
 
         AddWarnings(warnings, trzba, environment, now);
 
-        return new TrzbaValidationResult(errors, warnings);
+        return new EetValidationResult(errors, warnings);
     }
 
     private static void CheckPattern(List<EetValidationError> errors, string field, string? value, Regex pattern, string rule)

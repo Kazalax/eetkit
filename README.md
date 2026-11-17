@@ -40,6 +40,8 @@ else if (vysledek.IsRetryable)
     Console.WriteLine("Poslat znovu později s new SendOptions(PrvniZaslani: false)");
 ```
 
+Certifikát uložený jinde než v souboru, třeba v databázi, načte `EetClient.FromPkcs12(bajty, heslo, EetEnvironment.Playground)`.
+
 ## Výsledek odeslání
 
 | `Status` | Co to znamená | Co dál |
@@ -81,6 +83,8 @@ builder.Services.AddEet(o =>
 ```
 
 `AddEet` zaregistruje `EetClient` jako jednu sdílenou instanci, kterou si necháte předat do konstruktoru. Při startu aplikace se zkontroluje nastavení a certifikát se zkusí otevřít, takže špatná cesta nebo heslo zastaví start. Vlastní zdroj certifikátu (například trezor klíčů) zaregistrujte jako `IEetCertificateProvider`.
+
+Klient je zaregistrovaný i jako `IEetClient`. V testech kódu, který tržby posílá, ho nahradíte vlastní implementací a výsledky pro ni vytvoří `EetModelFactory.Result(...)`.
 
 ## Co knihovna hlídá
 

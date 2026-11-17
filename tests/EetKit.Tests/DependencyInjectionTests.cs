@@ -97,6 +97,14 @@ public sealed class DependencyInjectionTests
     }
 
     [Fact]
+    public void AddEet_RegistersIEetClient_SameInstanceAsEetClient()
+    {
+        using var provider = Build(TestCertificate);
+
+        Assert.Same(provider.GetRequiredService<EetClient>(), provider.GetRequiredService<IEetClient>());
+    }
+
+    [Fact]
     public void WrongPassword_FailsValidationAtStart()
     {
         var (p12, _) = SpecFiles.TestCertificate(Eic);

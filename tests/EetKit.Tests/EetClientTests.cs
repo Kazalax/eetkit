@@ -144,6 +144,59 @@ public sealed class EetClientTests : IDisposable
     }
 
     [Fact]
+    public void Validate_InvalidPoradCis_ReturnsErrorAndSendsNothing()
+    {
+        var handler = StubHttpHandler.Returning(Fixtures.Bytes(Fixtures.Chyba4));
+
+        var result = Client(handler).Validate(_trzba with { PoradCis = "účtenka 1" });
+
+        Assert.False(result.IsValid);
+        Assert.Equal("porad_cis", Assert.Single(result.Errors).Field);
+        Assert.Empty(handler.Requests);
+    }
+
+    [Fact]
+    public void Validate_ValidSale_IsValid()
+    {
+        var result = Client(StubHttpHandler.Returning([])).Validate(_trzba);
+
+        Assert.True(result.IsValid);
+        Assert.Empty(result.Errors);
+    }
+
+    [Fact]
+    public async Task FromPkcs12Bytes_SendsLikeFromFile()
+    {
+        // The client from bytes owns its HTTP client, so the request is cancelled before it leaves:
+        // validation, certificate and signing all run, nothing goes to the network.
+        var (p12, password) = SpecFiles.TestCertificate(Eic);
+        using var cancelled = new CancellationTokenSource();
+#if NETFRAMEWORK
+        cancelled.Cancel();
+#else
+        await cancelled.CancelAsync();
+#endif
+
+        using var client = EetClient.FromPkcs12(p12, password, EetEnvironment.Playground);
+
+        Assert.True(client.Validate(_trzba).IsValid);
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() =>
+            client.SendAsync(_trzba, cancellationToken: cancelled.Token));
+    }
+
+    [Fact]
+    public void FromPkcs12Bytes_WrongPassword_ThrowsCertificateException()
+    {
+        const string wrongPassword = "spatne-heslo-123";
+        var (p12, _) = SpecFiles.TestCertificate(Eic);
+
+        var exception = Assert.Throws<EetCertificateException>(() =>
+            EetClient.FromPkcs12(p12, wrongPassword, EetEnvironment.Playground));
+
+        Assert.DoesNotContain(wrongPassword, exception.ToString(), StringComparison.Ordinal);
+    }
+
+    [Fact]
     public async Task ServerTooSlow_TemporaryError()
     {
         var handler = new StubHttpHandler(async (_, token) =>

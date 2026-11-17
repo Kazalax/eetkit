@@ -14,8 +14,8 @@ public static class EetServiceCollectionExtensions
     private static readonly TimeSpan PooledConnectionLifetime = TimeSpan.FromMinutes(2);
 
     /// <summary>
-    /// Zaregistruje <see cref="EetClient"/> jako jednu sdílenou instanci. Certifikát se vezme
-    /// z <see cref="EetOptions"/>, nebo z vlastního <see cref="IEetCertificateProvider"/>, pokud je
+    /// Zaregistruje <see cref="EetClient"/> jako jednu sdílenou instanci, dostupnou i jako <see cref="IEetClient"/>.
+    /// Certifikát se vezme z <see cref="EetOptions"/>, nebo z vlastního <see cref="IEetCertificateProvider"/>, pokud je
     /// zaregistrovaný (před voláním i po něm). Nastavení i certifikát se zkontrolují při startu aplikace.
     /// </summary>
     public static IServiceCollection AddEet(this IServiceCollection services, Action<EetOptions> configure)
@@ -64,6 +64,7 @@ public static class EetServiceCollectionExtensions
                 sp.GetRequiredService<IHttpClientFactory>().CreateClient(HttpClientName),
                 sp.GetService<TimeProvider>());
         });
+        services.TryAddSingleton<IEetClient>(sp => sp.GetRequiredService<EetClient>());
 
         return services;
     }

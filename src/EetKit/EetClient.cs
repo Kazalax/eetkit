@@ -8,7 +8,7 @@ namespace EetKit;
 /// <summary>
 /// Posílá tržby do EET 2.0. Jedna instance se dá sdílet mezi vlákny po celou dobu běhu aplikace.
 /// </summary>
-public sealed class EetClient : IDisposable
+public sealed class EetClient : IEetClient, IDisposable
 {
     private const string SoapAction = "\"http://fs.gov.cz/eet/OdeslaniTrzby\"";
     private const string TransactionIdHeader = "X-Global-Transaction-Id";
@@ -70,21 +70,28 @@ public sealed class EetClient : IDisposable
     /// Vytvoří klienta s certifikátem ze souboru .p12 a vlastním HTTP klientem. Klienta je potřeba uvolnit.
     /// </summary>
     /// <exception cref="EetCertificateException">Certifikát nejde načíst.</exception>
-    public static EetClient FromPkcs12(string path, string password, EetEnvironment environment)
-    {
-        var provider = new FixedCertificateProvider(EetCertificate.FromPkcs12File(path, password));
-        var httpClient = CreateHttpClient();
-        var owned = new CompositeDisposable(httpClient, provider);
-        return new EetClient(provider, new EetClientOptions { Environment = environment }, httpClient, null, owned);
-    }
+    public static EetClient FromPkcs12(string path, string password, EetEnvironment environment) =>
+        WithOwnedCertificate(EetCertificate.FromPkcs12File(path, password), environment);
 
     /// <summary>
-    /// Zkontroluje, podepíše a odešle tržbu. Každé volání je nová zpráva s novým <c>uuid_zpravy</c>.
+    /// Vytvoří klienta s certifikátem z obsahu souboru .p12 (například z databáze nebo trezoru)
+    /// a vlastním HTTP klientem. Klienta je potřeba uvolnit.
     /// </summary>
-    /// <param name="trzba">Údaje o tržbě.</param>
-    /// <param name="options">První zaslání nebo opakování, ověřovací režim.</param>
-    /// <param name="cancellationToken">Zrušení volajícím vyhodí <see cref="OperationCanceledException"/>.</param>
-    /// <exception cref="EetValidationException">Data tržby nejsou platná. Nic se neodeslalo.</exception>
+    /// <param name="data">Obsah souboru .p12 (PKCS#12).</param>
+    /// <param name="password">Heslo k souboru.</param>
+    /// <param name="environment">Playground nebo produkce.</param>
+    /// <exception cref="EetCertificateException">Certifikát nejde načíst.</exception>
+    public static EetClient FromPkcs12(byte[] data, string password, EetEnvironment environment) =>
+        WithOwnedCertificate(EetCertificate.FromPkcs12(data, password), environment);
+
+    /// <inheritdoc />
+    public EetValidationResult Validate(Trzba trzba)
+    {
+        Guard.NotNull(trzba, nameof(trzba));
+        return TrzbaValidator.Validate(trzba, _options.Environment, _timeProvider.GetUtcNow());
+    }
+
+    /// <inheritdoc />
     public async Task<EetResult> SendAsync(Trzba trzba, SendOptions? options = null, CancellationToken cancellationToken = default)
     {
         Guard.NotNull(trzba, nameof(trzba));
@@ -92,7 +99,7 @@ public sealed class EetClient : IDisposable
 
         var now = _timeProvider.GetUtcNow();
         var validation = TrzbaValidator.Validate(trzba, _options.Environment, now);
-        if (validation.Errors.Count > 0)
+        if (!validation.IsValid)
         {
             throw new EetValidationException(validation.Errors);
         }
@@ -170,6 +177,14 @@ public sealed class EetClient : IDisposable
         cancellationToken.ThrowIfCancellationRequested();
         return await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
 #endif
+    }
+
+    private static EetClient WithOwnedCertificate(EetCertificate certificate, EetEnvironment environment)
+    {
+        var provider = new FixedCertificateProvider(certificate);
+        var httpClient = CreateHttpClient();
+        var owned = new CompositeDisposable(httpClient, provider);
+        return new EetClient(provider, new EetClientOptions { Environment = environment }, httpClient, null, owned);
     }
 
     private static HttpClient CreateHttpClient()
