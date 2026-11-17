@@ -144,6 +144,9 @@ def main() -> int:
     write_sitemap(output_dir, urls)
     write_indexnow_key(output_dir)
     shutil.copyfile(ROOT / "llms.txt", output_dir / "llms.txt")
+    # Google Search Console ownership file, served unchanged next to the pages.
+    for verification in (ROOT / "site").glob("google*.html"):
+        shutil.copyfile(verification, output_dir / verification.name)
     return 0
 
 
