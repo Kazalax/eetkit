@@ -116,13 +116,33 @@ def build_article(path: pathlib.Path, output_dir: pathlib.Path) -> None:
            url=url, og_type="article", jsonld=jsonld, body=body)
 
 
+def write_sitemap(output_dir: pathlib.Path, urls: list[str]) -> None:
+    entries = "\n".join(f"  <url><loc>{html.escape(url)}</loc></url>" for url in urls)
+    (output_dir / "sitemap.xml").write_text(
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+        f"{entries}\n</urlset>\n",
+        encoding="utf-8",
+    )
+
+
+def write_indexnow_key(output_dir: pathlib.Path) -> None:
+    """IndexNow (Bing and others) checks site ownership by fetching <key>.txt next to the pages."""
+    key = (ROOT / "site" / "indexnow-key.txt").read_text(encoding="utf-8").strip()
+    (output_dir / f"{key}.txt").write_text(key, encoding="utf-8")
+
+
 def main() -> int:
     output_dir = pathlib.Path(sys.argv[1])
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
     render(output_dir / "index.html", title=HOME_TITLE, description=HOME_DESCRIPTION, url=SITE_URL,
            og_type="website", jsonld=HOME_JSONLD, body=markdown_to_html(readme))
+    urls = [SITE_URL]
     for article in sorted((ROOT / "site" / "clanky").glob("*.md")):
         build_article(article, output_dir)
+        urls.append(f"{SITE_URL}clanky/{article.stem}/")
+    write_sitemap(output_dir, urls)
+    write_indexnow_key(output_dir)
     shutil.copyfile(ROOT / "llms.txt", output_dir / "llms.txt")
     return 0
 
