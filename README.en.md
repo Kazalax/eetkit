@@ -50,7 +50,7 @@ Sale fields keep the Czech names from the official specification (`celk_trzba` i
 | --- | --- | --- |
 | `Confirmed` | The server accepted the sale | Print the POK from `Pok` on the receipt |
 | `VerifiedOnly` | Verification mode (`Overeni = true`), code 0 | The message is valid, no POK is issued |
-| `TemporaryError` | Timeout, network error, server error (codes -1 and 8), any HTTP error, response without a valid signature | Send again with `PrvniZaslani = false`. The server detects duplicates itself |
+| `TemporaryError` | Timeout, network error, server error (codes -1 and 8), any HTTP error, response without a valid signature | Send again with `PrvniZaslani = false`, even if the server may have received it (as the data message description prescribes). A repeat may return a different POK |
 | `Rejected` | The server rejected the message (codes 2 to 7 and unknown positive codes) | Fix the data or certificate, retrying will not help |
 
 Invalid data is never sent: `SendAsync` throws `EetValidationException` listing the fields. Local warnings (for example an unusual `id_jednotky`, an expired certificate or an EIČ that does not match the certificate) are in `LocalWarnings`, server warnings in `Warnings`.

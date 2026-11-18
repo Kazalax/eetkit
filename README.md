@@ -48,7 +48,7 @@ Certifikát uložený jinde než v souboru, třeba v databázi, načte `EetClien
 | --- | --- | --- |
 | `Confirmed` | Server tržbu přijal | POK z `Pok` patří na účtenku |
 | `VerifiedOnly` | Ověřovací režim (`Overeni = true`), kód 0 | Zpráva je v pořádku, POK se nevydává |
-| `TemporaryError` | Timeout, výpadek sítě, chyba serveru (kódy -1 a 8), jakákoli chyba HTTP, odpověď bez platného podpisu | Poslat znovu s `PrvniZaslani = false`. Duplicitu server pozná sám |
+| `TemporaryError` | Timeout, výpadek sítě, chyba serveru (kódy -1 a 8), jakákoli chyba HTTP, odpověď bez platného podpisu | Poslat znovu s `PrvniZaslani = false`, i když zprávu server možná dostal (tak to předepisuje popis položek datové zprávy). Opakované zaslání může vrátit jiný POK |
 | `Rejected` | Server zprávu odmítl (kódy 2 až 7 a neznámé kladné kódy) | Opravit data nebo certifikát, opakování nepomůže |
 
 Neplatná data se nikdy neodešlou: `SendAsync` vyhodí `EetValidationException` se seznamem polí. Místní varování (například neobvyklý tvar `id_jednotky`, prošlý certifikát nebo EIČ, které nesedí s certifikátem) jsou v `LocalWarnings`, varování serveru ve `Warnings`.
