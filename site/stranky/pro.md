@@ -20,7 +20,7 @@ Tržba se uloží do databáze vaší aplikace ve stejné transakci jako prodej.
 
 ### Obnova pokladních certifikátů
 
-Certifikát platí rok. Pro ho obnoví sám přes rozhraní CA EET 21 dní před koncem platnosti, uloží ho bezpečně (do souboru se zálohou, nebo šifrovaně do databáze) a vymění za běhu, bez restartu. Obnova přežije výpadek v kterémkoli kroku. Ostrou zkoušku proti skutečnému serveru CA EET děláme s prvními zákazníky, do té doby je ověřená proti testovacímu serveru postavenému podle oficiální specifikace.
+Certifikát platí rok. Pro ho obnoví sám přes rozhraní CA EET 21 dní před koncem platnosti, uloží ho bezpečně (do souboru se zálohou, nebo šifrovaně do databáze) a vymění za běhu, bez restartu. Obnova přežije výpadek v kterémkoli kroku. Ostrou zkoušku proti skutečnému serveru CA EET děláme s prvními zákazníky, do té doby je ověřená proti testovacímu serveru postavenému podle oficiální specifikace a ve výchozím stavu vypnutá. Bez ní Pro nový certifikát, který nahrajete ručně, vymění za běhu také.
 
 ### Víc poplatníků v jedné aplikaci
 

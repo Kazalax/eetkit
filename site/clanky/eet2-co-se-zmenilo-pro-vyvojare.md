@@ -10,7 +10,7 @@ Povinnost evidovat tržby platí znovu od 1. ledna 2027 a leden má podle finan�
 
 ## Méně dat ve zprávě
 
-Datová zpráva EET 2.0 je kratší. V hlavičce zůstalo `uuid_zpravy`, `dat_odesl`, `prvni_zaslani` a `overeni`. V datech je EIČ poplatníka, případně EIČ pověřujícího poplatníka a příznak pověření více poplatníky, dále označení evidenční jednotky, označení pokladního zařízení, pořadové číslo tržby, datum a čas tržby, celková částka a dvě částky pro zálohy (`urceno_cerp_zuct` a `cerp_zuct`).
+V hlavičce datové zprávy EET 2.0 zůstalo `uuid_zpravy`, `dat_odesl`, `prvni_zaslani` a `overeni`. V datech je EIČ poplatníka, případně EIČ pověřujícího poplatníka a příznak pověření více poplatníky, dále označení evidenční jednotky, označení pokladního zařízení, pořadové číslo tržby, datum a čas tržby, celková částka a dvě částky pro zálohy (`urceno_cerp_zuct` a `cerp_zuct`).
 
 Zmizel celý rozpis DPH. Popis položek datové zprávy to říká přímo: údaji o evidované tržbě nejsou údaje týkající se daně z přidané hodnoty. Pryč jsou tedy `zakl_dan1` až `3`, `dan1` až `3`, `zakl_nepodl_dph`, `pouzit_zboz1` až `3` i `cest_sluz`. Zmizel také atribut `rezim`, který rozlišoval běžný a zjednodušený režim.
 
@@ -28,7 +28,7 @@ Server po přijetí tržby vrací POK. Ve starém EET to byl FIK. Podpisový kó
 
 Zpráva se podepisuje standardem WS-Security: XML podpis s kanonizací exc-c14n, otiskem SHA-256 a podpisem RSA-SHA256, certifikát poplatníka jde ve zprávě jako `BinarySecurityToken`. Finanční správa dává k dispozici tři vzorové podepsané zprávy. Vyplatí se dosáhnout s nimi shody bajt po bajtu, protože pak víte, že podpis skládáte stejně jako server.
 
-V .NET jsem narazil na jednu past. Třída `SignedXml` generuje prvky podpisu bez jmenného prefixu, kdežto vzory používají prefixy `ds:` a `ec:`. Podepsaná část `SignedInfo` pak nesedí a server podpis odmítne. `SignedInfo` jsem proto skládal ručně a `SignedXml` používám jen k ověřování.
+Třída `SignedXml` v .NET ale generuje prvky podpisu bez jmenného prefixu, kdežto vzory používají prefixy `ds:` a `ec:`. Podepsaná část `SignedInfo` pak nesedí a server podpis odmítne. `SignedInfo` jsem proto skládal ručně a `SignedXml` používám jen k ověřování.
 
 ## Certifikát ve starém formátu
 
