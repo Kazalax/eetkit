@@ -136,7 +136,7 @@ Yes, from version 4.7.2. The automated tests and sending to the playground run o
 
 ## Turnkey integration
 
-Need EET in your own point-of-sale system, a sales queue for network outages or automatic certificate renewal? Write to bedrichmaly79@gmail.com.
+Need EET in your own point-of-sale system, a sales queue for network outages or automatic certificate renewal? See [EetKit Pro](https://kazalax.github.io/eetkit/pro/) (in Czech), or write to bedrichmaly79@gmail.com.
 
 ## License
 

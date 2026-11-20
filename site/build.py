@@ -80,7 +80,7 @@ def render(output: pathlib.Path, *, title: str, description: str, url: str, og_t
     output.write_text(page, encoding="utf-8")
 
 
-def read_article(path: pathlib.Path) -> tuple[dict[str, str], str]:
+def read_front_matter(path: pathlib.Path, required: tuple[str, ...]) -> tuple[dict[str, str], str]:
     text = path.read_text(encoding="utf-8")
     match = FRONT_MATTER.match(text)
     if not match:
@@ -89,14 +89,14 @@ def read_article(path: pathlib.Path) -> tuple[dict[str, str], str]:
     for line in match.group(1).splitlines():
         key, _, value = line.partition(":")
         meta[key.strip()] = value.strip()
-    for key in ("title", "description", "date", "author"):
+    for key in required:
         if not meta.get(key):
             raise ValueError(f"{path}: v hlavičce chybí {key}")
     return meta, text[match.end():]
 
 
 def build_article(path: pathlib.Path, output_dir: pathlib.Path) -> None:
-    meta, markdown = read_article(path)
+    meta, markdown = read_front_matter(path, ("title", "description", "date", "author"))
     url = f"{SITE_URL}clanky/{path.stem}/"
     published = datetime.date.fromisoformat(meta["date"])
     byline = f'<p class="byline">{html.escape(meta["author"])}, {published.day}. {published.month}. {published.year}</p>'
@@ -132,6 +132,23 @@ def write_indexnow_key(output_dir: pathlib.Path) -> None:
     (output_dir / f"{key}.txt").write_text(key, encoding="utf-8")
 
 
+def build_page(path: pathlib.Path, output_dir: pathlib.Path) -> str:
+    """A standalone page from site/stranky, served at /<file name>/ (for example /pro/)."""
+    meta, markdown = read_front_matter(path, ("title", "description"))
+    url = f"{SITE_URL}{path.stem}/"
+    jsonld = {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "name": meta["title"],
+        "description": meta["description"],
+        "inLanguage": "cs",
+        "url": url,
+    }
+    render(output_dir / path.stem / "index.html", title=meta["title"], description=meta["description"],
+           url=url, og_type="website", jsonld=jsonld, body=markdown_to_html(markdown))
+    return url
+
+
 def main() -> int:
     output_dir = pathlib.Path(sys.argv[1])
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
@@ -141,6 +158,8 @@ def main() -> int:
     for article in sorted((ROOT / "site" / "clanky").glob("*.md")):
         build_article(article, output_dir)
         urls.append(f"{SITE_URL}clanky/{article.stem}/")
+    for page in sorted((ROOT / "site" / "stranky").glob("*.md")):
+        urls.append(build_page(page, output_dir))
     write_sitemap(output_dir, urls)
     write_indexnow_key(output_dir)
     shutil.copyfile(ROOT / "llms.txt", output_dir / "llms.txt")
