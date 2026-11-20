@@ -131,6 +131,7 @@ Ano, od verze 4.7.2. Automatické testy i odeslání na playground běží na .N
 ## Články
 
 - [EET 2.0 pro vývojáře: co se změnilo proti starému EET](https://kazalax.github.io/eetkit/clanky/eet2-co-se-zmenilo-pro-vyvojare/)
+- [Výpadek spojení v EET 2.0: co udělat s tržbou, která neprošla](https://kazalax.github.io/eetkit/clanky/eet2-vypadek-spojeni-co-s-trzbou/)
 
 ## Integrace na klíč
 

@@ -133,6 +133,7 @@ Yes, from version 4.7.2. The automated tests and sending to the playground run o
 ## Articles
 
 - [EET 2.0 pro vývojáře: co se změnilo proti starému EET](https://kazalax.github.io/eetkit/clanky/eet2-co-se-zmenilo-pro-vyvojare/) (in Czech): what changed for developers since the old EET
+- [Výpadek spojení v EET 2.0: co udělat s tržbou, která neprošla](https://kazalax.github.io/eetkit/clanky/eet2-vypadek-spojeni-co-s-trzbou/) (in Czech): what to do with a sale when the connection drops
 
 ## Turnkey integration
 
