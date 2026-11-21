@@ -38,7 +38,7 @@ Kontroly stavu pro ASP.NET Core (blížící se konec platnosti certifikátu, tr
 | Pro pro první tři firmy | 12 000 Kč za první rok |
 | Integrace na klíč | 7 500 Kč za den |
 
-Licence platí pro celou firmu, bez omezení počtu vývojářů a nasazení u vašich zákazníků. Obsahuje aktualizace a podporu e-mailem do dalšího pracovního dne.
+Licence platí pro celou firmu, bez omezení počtu vývojářů a nasazení u vašich zákazníků. Obsahuje aktualizace a podporu e-mailem do dalšího pracovního dne. Verze, které během placeného roku dostanete, smíte používat i po jeho skončení. Podrobnosti jsou v [licenčních podmínkách](https://kazalax.github.io/eetkit/licence/).
 
 Nižší cenu pro první tři firmy nabízíme výměnou za zpětnou vazbu, první ostrou obnovu certifikátu u vás a souhlas, že vás smíme uvést jako referenci.
 
@@ -60,7 +60,7 @@ Na .NET 8 a novějším (testováno na .NET 8 a .NET 10). Starý .NET Framework 
 
 ### Dostanu zdrojový kód?
 
-Ano, platící firmy dostanou přístup ke zdrojovému kódu Pro pro čtení. Nejste tak závislí na tom, že projekt někdo udržuje.
+Ano, platící firmy dostanou přístup k repozitáři se zdrojovým kódem Pro. Kód si smíte upravit a opravit pro vlastní potřebu, takže nejste závislí na tom, že projekt někdo udržuje.
 
 ### Kdo odpovídá za evidenci tržeb?
 
