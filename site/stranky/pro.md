@@ -46,7 +46,7 @@ Integrace na klíč znamená, že EetKit do vaší pokladny zapojíme za vás: o
 
 ## Jak začít
 
-Napište na [bedrichmaly79@gmail.com](mailto:bedrichmaly79@gmail.com), jaký software dodáváte a kolik máte zákazníků. Odpovím do dalšího pracovního dne.
+Napište na [bedrichmaly89@gmail.com](mailto:bedrichmaly89@gmail.com), jaký software dodáváte a kolik máte zákazníků. Odpovím do dalšího pracovního dne.
 
 ## Časté otázky
 

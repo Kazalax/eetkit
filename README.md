@@ -135,7 +135,7 @@ Ano, od verze 4.7.2. Automatické testy i odeslání na playground běží na .N
 
 ## Integrace na klíč
 
-Potřebujete EET zapojit do vlastní pokladny, frontu tržeb pro výpadky sítě nebo automatickou obnovu certifikátů? Podívejte se na [EetKit Pro](https://kazalax.github.io/eetkit/pro/), nebo napište na bedrichmaly79@gmail.com.
+Potřebujete EET zapojit do vlastní pokladny, frontu tržeb pro výpadky sítě nebo automatickou obnovu certifikátů? Podívejte se na [EetKit Pro](https://kazalax.github.io/eetkit/pro/), nebo napište na bedrichmaly89@gmail.com.
 
 ## Licence
 
